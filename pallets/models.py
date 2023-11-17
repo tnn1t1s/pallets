@@ -1,3 +1,5 @@
+import numpy as np
+import torch
 import torch.nn as nn
 import torch.optim as optim
 
@@ -27,20 +29,48 @@ class OneHotAutoencoder(nn.Module):
         return x
 
 
-def train_onehot(model, dataloader, epochs=5):
+def train_onehot(model, train_loader, test_loader, epochs=5):
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
+    train_losses = []
+    test_losses = []
+
     for epoch in range(epochs):
-        for data in dataloader:
+        batch_losses = []
+
+        for data in train_loader:
             inputs = data
+
             outputs = model(inputs)
             loss = criterion(outputs, inputs)
+
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            batch_losses.append(np.array(loss.item()))
 
-        print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item()}')
+        batch_loss = np.array(batch_losses).mean(axis=0)
+        print(f'Epoch [{epoch+1}/{epochs}]')
+        print(f'  - train loss: {batch_loss}')
+        train_losses.append(batch_loss)
+
+        model.eval()
+        with torch.no_grad():
+            batch_losses = []
+
+            for data in test_loader:
+                inputs = data
+
+                reconstruction = model(inputs)
+                loss = criterion(reconstruction, inputs)
+                batch_losses.append(np.array(loss.item()))
+
+            batch_loss = np.array(batch_losses).mean(axis=0)
+            print(f"  - test loss:  {batch_loss}")
+            test_losses.append(batch_loss)
+
+    return train_losses, test_losses
 
 
 class SimpleConvAutoencoder(nn.Module):
