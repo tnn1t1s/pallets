@@ -31,7 +31,7 @@ class OneHotAutoencoder(nn.Module):
         x = x.view(x.size(0), -1)  # Flatten
         x = self.encoder(x)
         x = self.decoder(x)
-        x = x.view(x.size(0), 24, 24, 222)
+        x = x.view(x.size(0), 222, 24, 24)
         return x
 
 

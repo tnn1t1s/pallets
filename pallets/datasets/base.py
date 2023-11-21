@@ -30,5 +30,5 @@ class CPunksDataset(Dataset):
         return len(self.image_files)
 
     def __getitem__(self, idx):
-        image = images.get_punk(idx)
+        image = images.get_punk_tensor(idx)
         return torch.tensor(image, dtype=torch.float32)
