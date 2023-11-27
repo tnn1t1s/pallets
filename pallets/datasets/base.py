@@ -1,16 +1,15 @@
-import numpy as np
 import torch
 from torch.utils.data import Dataset
 
 from .. import images
 
 
-def split_dataset(data, test_size=0):
+def split_dataset(ds_size, test_size=0):
     """
     Splits a list of data into two randomized sets of indexes.
     """
-    data_indices = list(range(len(data)))
-    np.random.shuffle(data_indices)
+    # shuffle indexes
+    data_indices = torch.randperm(ds_size).tolist()
 
     a_idx = data_indices[test_size:]
     b_idx = data_indices[:test_size]
@@ -19,16 +18,19 @@ def split_dataset(data, test_size=0):
 
 
 class CPunksDataset(Dataset):
-    def __init__(self, test_size=0):
-        self.image_files = [images.get_punk_path(i) for i in range(10000)]
-        self.test_size = test_size
+    """
+    Pytorch dataset that provides all images from cpunks-10k as torch tensors
+    """
+    SIZE = 10000
 
-        split_idx = split_dataset(self.image_files, self.test_size)
+    def __init__(self, test_size=0):
+        self._images = [images.get_punk_tensor(i) for i in range(self.SIZE)]
+        split_idx = split_dataset(self.SIZE, test_size)
         self.train_idx, self.test_idx = split_idx
 
     def __len__(self):
-        return len(self.image_files)
+        return len(self._images)
 
     def __getitem__(self, idx):
-        image = images.get_punk_tensor(idx)
-        return torch.tensor(image, dtype=torch.float32)
+        image = self._images[idx]
+        return image
