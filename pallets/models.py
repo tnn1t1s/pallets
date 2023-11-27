@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import torch
 import torch.nn as nn
@@ -10,12 +11,18 @@ import torch.optim as optim
 # - simple conv  + rgb
 # - simple conv  + one hot
 
-class OneHotAutoencoder(nn.Module):
+
+class NaiveAutoencoder(nn.Module):
+    """
+    Base class for naive autoencoder.
+    """
+    DATA_SHAPE = None
+
     def __init__(self):
-        super(OneHotAutoencoder, self).__init__()
+        super(NaiveAutoencoder, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Linear(24*24*222, 128),
+            nn.Linear(np.prod(self.DATA_SHAPE), 128),
             nn.ReLU(),
             nn.Linear(128, 64),
         )
@@ -23,7 +30,7 @@ class OneHotAutoencoder(nn.Module):
         self.decoder = nn.Sequential(
             nn.Linear(64, 128),
             nn.ReLU(),
-            nn.Linear(128, 24*24*222),
+            nn.Linear(128, np.prod(self.DATA_SHAPE)),
             nn.Sigmoid()
         )
 
@@ -31,54 +38,78 @@ class OneHotAutoencoder(nn.Module):
         x = x.view(x.size(0), -1)  # Flatten
         x = self.encoder(x)
         x = self.decoder(x)
-        x = x.view(x.size(0), 222, 24, 24)
+        x = x.view(x.size(0), *self.DATA_SHAPE)
         return x
 
 
-class SimpleConvAutoencoder(nn.Module):
+class NaiveRGBAAutoencoder(NaiveAutoencoder):
+    """
+    Naive autoencoder for RGBA images
+    """
+    DATA_SHAPE = (4, 24, 24)
+
+
+class NaiveOneHotAutoencoder(NaiveAutoencoder):
+    """
+    Naive autoencoder for one-hot encoded images
+    """
+    DATA_SHAPE = (222, 24, 24)
+
+
+class ConvRGBAutoencoder(nn.Module):
     def __init__(self):
-        super(SimpleConvAutoencoder, self).__init__()
+        super(ConvRGBAutoencoder, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(222, 64, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(4, 64, kernel_size=3, stride=1),
             nn.ReLU(),
-            nn.Conv2d(64, 32, kernel_size=3, stride=2, padding=1),
-            nn.ReLU()
+            nn.Conv2d(64, 32, kernel_size=3, stride=1),
+            nn.ReLU(),
         )
 
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(32, 64, kernel_size=2, stride=2),
+            nn.ConvTranspose2d(32, 64, kernel_size=3, stride=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 222, kernel_size=2, stride=2),
+            nn.ConvTranspose2d(64, 4, kernel_size=3, stride=1),
             nn.Sigmoid()
         )
 
     def forward(self, x):
-        # x.permute(0, 3, 1, 2)
         x = self.encoder(x)
         x = self.decoder(x)
-        # x.permute(0, 2, 3, 1)
+        return x
+
+
+class ConvOneHotAutoencoder(nn.Module):
+    def __init__(self):
+        super(ConvOneHotAutoencoder, self).__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Conv2d(222, 64, kernel_size=3, stride=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 32, kernel_size=3, stride=1),
+            nn.ReLU(),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(32, 64, kernel_size=3, stride=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 222, kernel_size=3, stride=1),
+        )
+
+    def forward(self, x):
+        x = self.encoder(x)
+        x = self.decoder(x)
         return x
 
 
 def train(
         model, criterion, train_loader, test_loader, learn_rate=1e-3, epochs=5
 ):
-    # Special case for Conv2D
-    if isinstance(model, SimpleConvAutoencoder):
-        # PyTorch's nn.Conv2d expects input in the format:
-        #   (batch_size, channels, height, width)
-        #
-        # Our dataloader uses mpimg, which uses this format:
-        #   (batch_size, height, width, channels)
-        #
-        # Change from: [32, 24, 24, 222]
-        # Change to:   [32, 222, 24, 24]
-        def prepare_inputs(x): return x.permute(0, 3, 1, 2)
-    else:
-        def prepare_inputs(x): return x
-
-    # Main loop
+    """
+    Training loop that tests the quality at each iteration while tracking
+    everything necessary to make pretty graphs.
+    """
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     train_losses = []
     test_losses = []
@@ -87,7 +118,7 @@ def train(
         batch_losses = []
 
         for data in train_loader:
-            inputs = prepare_inputs(data)
+            inputs = data
             outputs = model(inputs)
             loss = criterion(outputs, inputs)
 
@@ -107,7 +138,7 @@ def train(
             batch_losses = []
 
             for data in test_loader:
-                inputs = prepare_inputs(data)
+                inputs = data
                 reconstruction = model(inputs)
                 loss = criterion(reconstruction, inputs)
 
@@ -118,3 +149,32 @@ def train(
             test_losses.append(batch_loss)
 
     return train_losses, test_losses
+
+
+def _saved_path():
+    """
+    Helper function to save and load models from consistent location
+    """
+    parent_dir = os.path.dirname(os.path.dirname(__file__))
+    models_dir = os.path.join(parent_dir, 'saved')
+    if not os.path.exists(models_dir):
+        os.mkdir(models_dir)
+    return models_dir
+
+
+def save(model, filename):
+    """
+    Saves a model.
+    """
+    models_dir = _saved_path()
+    filepath = os.path.join(models_dir, filename)
+    torch.save(model, filepath)
+
+
+def load(filename):
+    """
+    Loads a model.
+    """
+    models_dir = _saved_path()
+    filepath = os.path.join(models_dir, filename)
+    return torch.load(filepath)
