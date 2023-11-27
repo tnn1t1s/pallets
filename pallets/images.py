@@ -1,7 +1,6 @@
 import os
 import PIL
-# import matplotlib.image as mpimg
-import numpy as np
+import torch
 from torchvision.transforms.functional import pil_to_tensor
 
 
@@ -29,35 +28,33 @@ def get_punk_tensor(id):
     Same thing as `get_punk`, but returns a tensor
     """
     image = get_punk(id)
-    return pil_to_tensor(image)
+    return pil_to_tensor(image) / 255
 
 
-#   unique_color_alpha_vectors
 def one_image_colors(img_datum):
     """
     Returns an array of unique colors found in an image array
     """
     img_datum = img_datum.reshape(img_datum.shape[0], -1)
-    uniques = np.unique(img_datum, axis=1)
+    uniques = torch.unique(img_datum, dim=1)
 
     return uniques.T
 
 
-#   find_unique_vectors_across_arrays
-def list_image_colors(img_datas):
+def many_image_colors(img_datas):
     """
     Returns an array of unique colors found in an array of images arrays
     """
-    img_data = np.concatenate(
+    img_data = torch.concatenate(
         [i.reshape(i.shape[0], -1) for i in img_datas],
         axis=-1
     )
-    uniques = np.unique(img_data, axis=1)
+    uniques = torch.unique(img_data, dim=1)
 
     return uniques.T
 
 
 def get_punk_colors():
     punks = [get_punk_tensor(i) for i in range(10000)]
-    colors = list_image_colors(punks)
+    colors = many_image_colors(punks)
     return colors
