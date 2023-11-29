@@ -6,9 +6,9 @@ The CPUNKS-10K dataset is a curated subset of the CryptoPunks image collection c
 
 The five types in the dataset are mutually exclusive: Alien, Ape, Zombie, Male, Female.
 
-### Attibutes Distributioni
+### Attibutes Distribution
 
-The remaining 87 classes may overlap allowing for a rich and complex label structure.
+The remaining 87 classes may overlap allowing for a rich and complex label structure that can be used for constrained autoencoder and decoder networks.
 
 ### Dataset Format
 
