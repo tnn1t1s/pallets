@@ -2,10 +2,6 @@
 
 The CPUNKS-10K dataset is a curated subset of the CryptoPunks image collection created by Larva Labs. The dataset has been specifically tailored for machine learning research. This dataset comprises 10,000 24x24x4 color images, each labeled with one of 5 unique types and 87 attributes. 
 
-### Dataset Composition
-
-The dataset is divided into four training batches and one test batch, each containing 2,000 images. The test batch is composed of randomly selected images from each class, ensuring a diverse and representative sample. The training batches, while also randomized, may exhibit a class imbalance, with certain batches having more images from specific classes than others.
-
 ### Type Distribution
 
 The five types in the dataset are mutually exclusive: Alien, Ape, Zombie, Male, Female.
