@@ -104,7 +104,8 @@ class ConvOneHotAutoencoder(nn.Module):
 
 
 def train(
-        model, criterion, train_loader, test_loader, learn_rate=1e-3, epochs=5
+        device, model, criterion, train_loader, test_loader, learn_rate=1e-3,
+        epochs=5
 ):
     """
     Training loop that tests the quality at each iteration while tracking
@@ -114,11 +115,14 @@ def train(
     train_losses = []
     test_losses = []
 
+    model.to(device)
+    criterion.to(device)
+
     for epoch in range(epochs):
         batch_losses = []
 
         for data in train_loader:
-            inputs = data
+            inputs = data.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, inputs)
 
@@ -138,7 +142,7 @@ def train(
             batch_losses = []
 
             for data in test_loader:
-                inputs = data
+                inputs = data.to(device)
                 reconstruction = model(inputs)
                 loss = criterion(reconstruction, inputs)
 
