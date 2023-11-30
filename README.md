@@ -23,5 +23,5 @@ Then setup a venv for pallets and install it
 cd pallets
 python -mvenv venv
 source venv/bin/activate
-pip install -e .
+pip install -r requirements.txt
 ```
