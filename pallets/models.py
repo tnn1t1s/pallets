@@ -5,16 +5,9 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-# make 4 models:
-# - naive linear + rgb
-# - naive linear + one hot
-# - simple conv  + rgb
-# - simple conv  + one hot
-
-
 class NaiveRGBAAutoencoder(nn.Module):
     """
-    Naive autoencoder for RGBA images
+    Naive autoencoder for 4 channel RGBA images
     """
     DATA_SHAPE = (4, 24, 24)
 
@@ -44,7 +37,7 @@ class NaiveRGBAAutoencoder(nn.Module):
 
 class NaiveOneHotAutoencoder(nn.Module):
     """
-    Naive autoencoder for one-hot encoded images
+    Naive autoencoder for one hot encoded color palette
     """
     DATA_SHAPE = (222, 24, 24)
 
@@ -72,6 +65,9 @@ class NaiveOneHotAutoencoder(nn.Module):
 
 
 class ConvRGBAAutoencoder(nn.Module):
+    """
+    CNN autoencoder for 4 channel RGBA images
+    """
     def __init__(self):
         super(ConvRGBAAutoencoder, self).__init__()
 
@@ -96,6 +92,9 @@ class ConvRGBAAutoencoder(nn.Module):
 
 
 class ConvOneHotAutoencoder(nn.Module):
+    """
+    222 channel cnn autoencoder for one hot encoded color palette
+    """
     def __init__(self):
         super(ConvOneHotAutoencoder, self).__init__()
 
@@ -183,7 +182,7 @@ def _saved_path():
 
 def save(model, filename):
     """
-    Saves a model.
+    Saves model as 'saved/<filename>'
     """
     models_dir = _saved_path()
     filepath = os.path.join(models_dir, filename)
@@ -192,7 +191,7 @@ def save(model, filename):
 
 def load(filename):
     """
-    Loads a model.
+    Loads model from `saved/<filename>`
     """
     models_dir = _saved_path()
     filepath = os.path.join(models_dir, filename)
