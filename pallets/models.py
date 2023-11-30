@@ -71,9 +71,9 @@ class NaiveOneHotAutoencoder(nn.Module):
         return x
 
 
-class ConvRGBAutoencoder(nn.Module):
+class ConvRGBAAutoencoder(nn.Module):
     def __init__(self):
-        super(ConvRGBAutoencoder, self).__init__()
+        super(ConvRGBAAutoencoder, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Conv2d(4, 64, kernel_size=3, stride=1),
