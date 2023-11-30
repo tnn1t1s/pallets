@@ -12,16 +12,17 @@ import torch.optim as optim
 # - simple conv  + one hot
 
 
-class NaiveAutoencoder(nn.Module):
+class NaiveRGBAAutoencoder(nn.Module):
     """
-    Base class for naive autoencoder.
+    Naive autoencoder for RGBA images
     """
-    DATA_SHAPE = None
+    DATA_SHAPE = (4, 24, 24)
 
     def __init__(self):
-        super(NaiveAutoencoder, self).__init__()
+        super(NaiveRGBAAutoencoder, self).__init__()
 
         self.encoder = nn.Sequential(
+            nn.Flatten(),
             nn.Linear(np.prod(self.DATA_SHAPE), 128),
             nn.ReLU(),
             nn.Linear(128, 64),
@@ -31,29 +32,43 @@ class NaiveAutoencoder(nn.Module):
             nn.Linear(64, 128),
             nn.ReLU(),
             nn.Linear(128, np.prod(self.DATA_SHAPE)),
-            nn.Sigmoid()
+            nn.Sigmoid(),
+            nn.Unflatten(1, self.DATA_SHAPE)
         )
 
     def forward(self, x):
-        x = x.view(x.size(0), -1)  # Flatten
         x = self.encoder(x)
         x = self.decoder(x)
-        x = x.view(x.size(0), *self.DATA_SHAPE)
         return x
 
 
-class NaiveRGBAAutoencoder(NaiveAutoencoder):
-    """
-    Naive autoencoder for RGBA images
-    """
-    DATA_SHAPE = (4, 24, 24)
-
-
-class NaiveOneHotAutoencoder(NaiveAutoencoder):
+class NaiveOneHotAutoencoder(nn.Module):
     """
     Naive autoencoder for one-hot encoded images
     """
     DATA_SHAPE = (222, 24, 24)
+
+    def __init__(self):
+        super(NaiveOneHotAutoencoder, self).__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(np.prod(self.DATA_SHAPE), 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.Linear(64, 128),
+            nn.ReLU(),
+            nn.Linear(128, np.prod(self.DATA_SHAPE)),
+            nn.Unflatten(1, self.DATA_SHAPE)
+        )
+
+    def forward(self, x):
+        x = self.encoder(x)
+        x = self.decoder(x)
+        return x
 
 
 class ConvRGBAutoencoder(nn.Module):
