@@ -4,6 +4,7 @@ import torch
 from torchvision.transforms.functional import pil_to_tensor
 
 
+# https://github.com/tnn1t1s/cpunks-10k
 CPUNKS_DATA_DIR = "../../cpunks-10k/cpunks/data"
 CPUNKS_IMAGE_DIR = "../../cpunks-10k/cpunks/images/training"
 
