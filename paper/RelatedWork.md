@@ -2,6 +2,8 @@
 
 In https://www.sbgames.org/sbgames2019/files/papers/ComputacaoFull/197880.pdf the authors use Pix2Pix to build a model to transform an hand drawn image of a character into a (256,256,24) pixelate version. They use color quantization to constrain palletts but are careful to point out artists frustration with this methods accuracy "a considerable amount of noise still remained. Examples of rounding errors are shown in Fig. 12. For artists, fixing noisy images is a tedious and time consuming task"
 
+In http://colormind.io/blog/extracting-colors-from-photos-and-video/, the authros biulds a GAN to learn color palettes from iamges. This is useful for artists wwho want to work within a color palette of a set of images and this work can be complementary to ours - but hte author does not proceed to the next logical step of sing hte leanred colored pallettes to  generate our images. In the results seciton of this paperm we show how we can learn a pallette from on distrivbugtions and apply to another 
+
 other work to read later
      - [4] C. Baker, M. Schleser, and K. Molga, “Aesthetics of mobile
 media art,” Journal of Media Practice, vol. 10, no. 2-3, pp.
