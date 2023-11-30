@@ -15,12 +15,17 @@ The remaining 87 classes may overlap allowing for a rich and complex label struc
 - `images/image{N}`: 10,000 (24,24,4) array of uint8s representing an image of ID N
 - `labels.json`: A JSON format dictionary containing the set of types and attributues keyed by N.
 
+We've made the decision to not using the 'types' classes for this work -- which are likely to infer assignment of gender. Using gender as a classification category in machine learning datasets can raise several important issues, particularly related to bias, ethics, and the complexity of gender identity. 
+
 ## 3.2 Data Preprocessing
-For the work in this paper, we will use the images and attributes to build a set of models used to demonstrate the performance and phenomenological effects of using color palette aware neural networks.
+For the work in this paper, we will use the images and attributes to build a set of models used to demonstrate the performance and phenomenological effects of using color palette aware neural networks. This section explains the preprocessing steps needed to build the features that will be used for model input
 
-We've made the decision to not using the 'types' classes - which are likely to infer assignment of gender. Using gender as a classification category in machine learning datasets can raise several important issues, particularly related to bias, ethics, and the complexity of gender identity. 
-
-(explain color map)
+### 3.1 ImageDataLoader
 (show all colors)
 (show color mapper)
 (show dataloader)
+### 3.2 LabelDataLoader
+
+### 3.3 Aligning Images and Labels
+
+
