@@ -137,8 +137,8 @@ def train(
 
         for data in train_loader:
             inputs = data.to(device)
-            outputs = model(inputs)
-            loss = criterion(outputs, inputs)
+            reconstruction = model(inputs)
+            loss = criterion(reconstruction)
 
             optimizer.zero_grad()
             loss.backward()
@@ -158,7 +158,7 @@ def train(
             for data in test_loader:
                 inputs = data.to(device)
                 reconstruction = model(inputs)
-                loss = criterion(reconstruction, inputs)
+                loss = criterion(reconstruction)
 
                 batch_losses.append(np.array(loss.item()))
 
