@@ -1,6 +1,6 @@
 import torch
 
-from .base import CPunksDataset
+from .base import CPunksDataset, CPunksAndLabelsDataset, CPUNKS_LABELS
 
 
 def make_one_hot_vector(index, length):
@@ -112,3 +112,18 @@ class OneHotEncodedImageDataset(CPunksDataset):
         image = rgba_to_one_hot(image, self.mapper)
         image = image.to(self.device)
         return image
+
+
+class OneHotAndLabelsDataset(CPunksAndLabelsDataset):
+    """
+    Same thing as OneHotEncodedImageDataset, but also loads the label data
+    """
+    def __init__(self, mapper, *args, **kwargs):
+        super(OneHotAndLabelsDataset, self).__init__(*args, **kwargs)
+        self.mapper = mapper
+
+    def __getitem__(self, idx):
+        image, labels = super(OneHotAndLabelsDataset, self).__getitem__(idx)
+        image = rgba_to_one_hot(image, self.mapper)
+        image = image.to(self.device)
+        return image, labels

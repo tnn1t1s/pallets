@@ -1,7 +1,10 @@
+import json
 import torch
 from torch.utils.data import Dataset
 
 from .. import images
+
+CPUNKS_LABELS = "../../cpunks-10k/cpunks/data/punks.json"
 
 
 def split_dataset(ds_size, test_size=0):
@@ -38,6 +41,23 @@ class CPunksDataset(Dataset):
         return len(self._images)
 
     def __getitem__(self, idx):
-        image = self._images[idx]
-        image = image.to(self.device)
+        image = self._images[idx].to(self.device)
         return image
+
+
+class CPunksAndLabelsDataset(CPunksDataset):
+    """
+    Same thing as CPunksData, but also loads the label data
+    """
+    def __init__(self, *args, **kwargs):
+        super(CPunksAndLabelsDataset, self).__init__(*args, **kwargs)
+        all_labels = json.load(open(CPUNKS_LABELS))
+        self._labels = []
+        for _,label in all_labels.items():
+            t = torch.tensor([v for _,v in label.items()])
+            self._labels.append(t)
+
+    def __getitem__(self, idx):
+        image = self._images[idx].to(self.device)
+        labels = self._labels[idx].to(self.device)
+        return image, labels
