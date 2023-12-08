@@ -57,7 +57,6 @@ print("Train Model", flush=True)
 
 model = M.vae.LabeledVAE(222, (64, 32), 20, num_labels).to(device)
 criterion = M.vae.Loss().to(device)
-optimizer = optim.Adam(model.parameters(), lr=LR)
 
 
 train_losses, test_losses = M.vae.train(
