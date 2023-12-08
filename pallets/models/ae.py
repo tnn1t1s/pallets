@@ -5,11 +5,14 @@ import torch.nn as nn
 import torch.optim as optim
 
 
+from .base import RGBA_CHANNELS, ONE_HOT_CHANNELS
+
+
 class NaiveRGBAAutoencoder(nn.Module):
     """
     Naive autoencoder for 4 channel RGBA images
     """
-    DATA_SHAPE = (4, 24, 24)
+    DATA_SHAPE = (RGBA_CHANNELS, 24, 24)
 
     def __init__(self):
         super(NaiveRGBAAutoencoder, self).__init__()
@@ -39,7 +42,7 @@ class NaiveOneHotAutoencoder(nn.Module):
     """
     Naive autoencoder for one hot encoded color palette
     """
-    DATA_SHAPE = (222, 24, 24)
+    DATA_SHAPE = (ONE_HOT_CHANNELS, 24, 24)
 
     def __init__(self):
         super(NaiveOneHotAutoencoder, self).__init__()
@@ -66,13 +69,13 @@ class NaiveOneHotAutoencoder(nn.Module):
 
 class ConvRGBAAutoencoder(nn.Module):
     """
-    CNN autoencoder for 4 channel RGBA images
+    CNN autoencoder RGBA images
     """
     def __init__(self):
         super(ConvRGBAAutoencoder, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(4, 64, kernel_size=3, stride=1),
+            nn.Conv2d(RGBA_CHANNELS, 64, kernel_size=3, stride=1),
             nn.ReLU(),
             nn.Conv2d(64, 32, kernel_size=3, stride=1),
             nn.ReLU(),
@@ -93,13 +96,13 @@ class ConvRGBAAutoencoder(nn.Module):
 
 class ConvOneHotAutoencoder(nn.Module):
     """
-    222 channel cnn autoencoder for one hot encoded color palette
+    CNN autoencoder one hot images
     """
     def __init__(self):
         super(ConvOneHotAutoencoder, self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(222, 64, kernel_size=3, stride=1),
+            nn.Conv2d(ONE_HOT_CHANNELS, 64, kernel_size=3, stride=1),
             nn.ReLU(),
             nn.Conv2d(64, 32, kernel_size=3, stride=1),
             nn.ReLU(),
@@ -108,13 +111,14 @@ class ConvOneHotAutoencoder(nn.Module):
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(32, 64, kernel_size=3, stride=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 222, kernel_size=3, stride=1),
+            nn.ConvTranspose2d(64, ONE_HOT_CHANNELS, kernel_size=3, stride=1),
         )
 
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
         return x
+
 
 
 def train(
@@ -136,9 +140,9 @@ def train(
         batch_losses = []
 
         for data in train_loader:
-            inputs = data.to(device)
-            reconstruction = model(inputs)
-            loss = criterion(reconstruction)
+            data = data.to(device)
+            reconstruction = model(data)
+            loss = criterion(reconstruction, data)
 
             optimizer.zero_grad()
             loss.backward()
@@ -156,9 +160,9 @@ def train(
             batch_losses = []
 
             for data in test_loader:
-                inputs = data.to(device)
-                reconstruction = model(inputs)
-                loss = criterion(reconstruction)
+                data = data.to(device)
+                reconstruction = model(data)
+                loss = criterion(reconstruction, data)
 
                 batch_losses.append(np.array(loss.item()))
 
@@ -167,32 +171,3 @@ def train(
             test_losses.append(batch_loss)
 
     return train_losses, test_losses
-
-
-def _saved_path():
-    """
-    Helper function to save and load models from consistent location
-    """
-    parent_dir = os.path.dirname(os.path.dirname(__file__))
-    models_dir = os.path.join(parent_dir, 'saved')
-    if not os.path.exists(models_dir):
-        os.mkdir(models_dir)
-    return models_dir
-
-
-def save(model, filename):
-    """
-    Saves model as 'saved/<filename>'
-    """
-    models_dir = _saved_path()
-    filepath = os.path.join(models_dir, filename)
-    torch.save(model, filepath)
-
-
-def load(filename):
-    """
-    Loads model from `saved/<filename>`
-    """
-    models_dir = _saved_path()
-    filepath = os.path.join(models_dir, filename)
-    return torch.load(filepath)
