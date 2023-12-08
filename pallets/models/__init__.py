@@ -1,3 +1,5 @@
-from . import ae, base, vae
+from . import ae, vae
 
-__all__ = [ae, base, vae]
+from .base import save, load
+
+__all__ = [ae, vae, save, load]
