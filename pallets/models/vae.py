@@ -1,4 +1,5 @@
 import os
+import datetime
 import numpy as np
 import torch
 import torch.nn as nn
@@ -173,15 +174,17 @@ def train(
             batch_losses.append(np.array(loss.item()))
 
             if batch_idx % 100 == 0:
+                print(datetime.datetime.now().isoformat(), end=" ")
                 print('epoch {} ({:.0f}%)\t loss: {:.6f}'.format(
                     epoch+1,
                     100. * batch_idx / len(train_loader),
-                    loss.item() / len(batch_data)))
+                    loss.item() / len(batch_data)), flush=True)
 
         batch_loss = np.array(batch_losses).mean(axis=0)
+        print(datetime.datetime.now().isoformat(), end=" ")
         print('epoch {} (100%)\t loss: {:.6f}'.format(
             epoch+1,
-            train_loss / len(train_loader.dataset.train_idx)))
+            train_loss / len(train_loader.dataset.train_idx)), flush=True)
         train_losses.append(batch_loss)
 
         model.eval()
@@ -198,9 +201,10 @@ def train(
                 batch_losses.append(np.array(loss.item()))
 
             batch_loss = np.array(batch_losses).mean(axis=0)
+            print(datetime.datetime.now().isoformat(), end=" ")
             print("epoch {} test\t loss: {:.6f}".format(
                 epoch+1,
-                test_loss / len(test_loader.dataset.test_idx)))
+                test_loss / len(test_loader.dataset.test_idx)), flush=True)
             test_losses.append(batch_loss)
 
     return train_losses, test_losses

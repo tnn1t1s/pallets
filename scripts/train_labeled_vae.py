@@ -17,7 +17,7 @@ from pallets import images as I, datasets as DS, models as M
 ### Settings
 USE_GPU = True
 TEST_SIZE = 1000
-EPOCHS = 3
+EPOCHS = 50
 LR = 1e-03
 ###
 
@@ -30,7 +30,7 @@ else:
 
 # Prep Data
 
-print("Prep Data")
+print("Prep Data", flush=True)
 
 all_colors = I.get_punk_colors()
 mapper = DS.ColorOneHotMapper(all_colors)
@@ -53,7 +53,7 @@ num_labels = len(dataset._labels[0])
 
 # Train Model
 
-print("Train Model")
+print("Train Model", flush=True)
 
 model = M.vae.LabeledVAE(222, (64, 32), 20, num_labels).to(device)
 criterion = M.vae.Loss().to(device)
