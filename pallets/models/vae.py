@@ -203,3 +203,5 @@ def train(
                 test_loss / len(test_loader.dataset.test_idx)))
             test_losses.append(batch_loss)
 
+    return train_losses, test_losses
+
