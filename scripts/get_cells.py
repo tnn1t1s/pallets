@@ -1,6 +1,6 @@
 import nbformat
 
-thenb = 'nb/laebels.ipynb'
+thenb = '../nb/laebels.ipynb'
 
 f = open(thenb)
 notebook = nbformat.read(f, as_version=4)
