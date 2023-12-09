@@ -1,35 +1,29 @@
 import sys
 import os
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torchvision import transforms
 from torch.utils.data import DataLoader, SubsetRandomSampler
-import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
+
 
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
-from pallets import images as I, datasets as DS, models as M
+from pallets import images as I, datasets as DS, models as M, logging as L
 
 
 ### Settings
 USE_GPU = True
+LOG_LEVEL = 'INFO'
 TEST_SIZE = 1000
-EPOCHS = 50
+EPOCHS = 3
 LR = 1e-03
 ###
 
 
-# To GPU, or not to GPU
-print(f"GPU: {USE_GPU}", flush=True)
+# Env
+logger = L.init_logger(level=LOG_LEVEL, timestamp=True)
 device = M.get_device(require_gpu=USE_GPU)
 
 
 # Prep Data
 
-print("Prep Data", flush=True)
+logger.info("preparing data loaders")
 
 all_colors = I.get_punk_colors()
 mapper = DS.ColorOneHotMapper(all_colors)
@@ -52,7 +46,7 @@ num_labels = len(dataset._labels[0])
 
 # Train Model
 
-print("Train Model", flush=True)
+logger.info("starting model training")
 
 model = M.vae.LabeledVAE(222, (64, 32), 20, num_labels).to(device)
 criterion = M.vae.Loss().to(device)
@@ -64,4 +58,4 @@ train_losses, test_losses = M.vae.train(
 )
 
 
-M.save(model, 'tlv.pkl')
+M.save('labeled_vae', model, train_losses, test_losses)
