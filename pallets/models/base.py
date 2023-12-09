@@ -1,4 +1,5 @@
 import os
+import json
 import torch
 
 
@@ -10,20 +11,34 @@ def _saved_path():
     """
     Helper function to save and load models from consistent location
     """
-    parent_dir = os.path.dirname(os.path.dirname(__file__))
+    parent_dir = __file__
+    for _ in range(3):  # go up three directories
+        parent_dir = os.path.dirname(parent_dir)
+
     models_dir = os.path.join(parent_dir, 'saved')
     if not os.path.exists(models_dir):
         os.mkdir(models_dir)
+
     return models_dir
 
 
-def save(model, filename):
+def save(modelname, model, train_losses, test_losses):
     """
     Saves model as 'saved/<filename>'
     """
     models_dir = _saved_path()
-    filepath = os.path.join(models_dir, filename)
-    torch.save(model, filepath)
+    modelpath = os.path.join(models_dir, f'{modelname}.pkl')
+    metapath = os.path.join(models_dir, f'{modelname}.json')
+
+    torch.save(model, modelpath)
+
+    losses = {
+        'train_losses': train_losses,
+        'test_losses': test_losses
+    }
+    with open(metapath, 'w') as f:
+        l_json = json.dumps(losses)
+        f.write(l_json)
 
 
 def load(filename):
