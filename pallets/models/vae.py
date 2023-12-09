@@ -158,6 +158,11 @@ def train(
     Variational Autoencoder focused training loop. Returns the loss information
     collected across epochs.
     """
+    logger.info(f"model: {model.__class__.__name__}")
+    logger.info(f"criterion: {criterion.__class__.__name__}")
+    logger.info(f"learn rate: {learn_rate}")
+    logger.info(f"epochs: {epochs}")
+
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     train_losses = []
     test_losses = []
