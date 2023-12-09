@@ -33,3 +33,18 @@ def load(filename):
     models_dir = _saved_path()
     filepath = os.path.join(models_dir, filename)
     return torch.load(filepath)
+
+
+def get_device(require_gpu=True):
+    """
+    Does its best to find a GPU and falls back to CPU. Set `require_gpu` to
+    True to throw exception if GPU isn't found.
+    """
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        return torch.device("mps")
+    else:
+        if require_gpu:
+            raise Exception("No GPU found")
+        return torch.device("cpu")

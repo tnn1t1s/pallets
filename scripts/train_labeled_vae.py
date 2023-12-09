@@ -22,10 +22,9 @@ LR = 1e-03
 ###
 
 
-if USE_GPU:
-    device = torch.device("cuda")
-else:
-    device = torch.device("cpu")
+# To GPU, or not to GPU
+print(f"GPU: {USE_GPU}", flush=True)
+device = M.get_device(require_gpu=USE_GPU)
 
 
 # Prep Data
