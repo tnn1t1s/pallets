@@ -6,6 +6,7 @@ import torch.optim as optim
 
 
 from .base import RGBA_CHANNELS, ONE_HOT_CHANNELS
+from ..logging import logger
 
 
 class NaiveRGBAAutoencoder(nn.Module):
@@ -122,12 +123,12 @@ class ConvOneHotAutoencoder(nn.Module):
 
 
 def train(
-        device, model, criterion, train_loader, test_loader, learn_rate=1e-3,
-        epochs=5
+    device, model, criterion, train_loader, test_loader, learn_rate=1e-3,
+    epochs=5
 ):
     """
-    Training loop that tests the quality at each iteration while tracking
-    everything necessary to make pretty graphs.
+    Autoencoder focused training loop. Returns the loss information collected
+    across epochs.
     """
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     train_losses = []
@@ -137,37 +138,47 @@ def train(
     criterion.to(device)
 
     for epoch in range(epochs):
-        batch_losses = []
+        epoch_losses = []
 
-        for data in train_loader:
-            data = data.to(device)
+        for batch_idx, batch_data in enumerate(train_loader):
             reconstruction = model(data)
             loss = criterion(reconstruction, data)
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            epoch_losses.append(np.array(loss.item()))
 
-            batch_losses.append(np.array(loss.item()))
+            if batch_idx % 100 == 0:
+                logger.info('epoch {} ({}%) loss: {:.6f}'.format(
+                    epoch+1,
+                    str(100 * batch_idx // len(train_loader)).rjust(3),
+                    np.array(epoch_losses).mean(axis=0) / len(batch_data)
+                ))
 
-        batch_loss = np.array(batch_losses).mean(axis=0)
-        print(f'epoch [{epoch+1}/{epochs}]')
-        print(f'  - train loss: {batch_loss}')
-        train_losses.append(batch_loss)
+        epoch_loss = np.array(epoch_losses).mean(axis=0)
+        train_losses.append(epoch_loss)
+        logger.info('epoch {} (100%) loss: {:.6f}'.format(
+            epoch+1,
+            epoch_loss / len(batch_data)
+        ))
 
         model.eval()
         with torch.no_grad():
-            batch_losses = []
+            epoch_losses = []
 
             for data in test_loader:
                 data = data.to(device)
                 reconstruction = model(data)
                 loss = criterion(reconstruction, data)
 
-                batch_losses.append(np.array(loss.item()))
+                epoch_losses.append(np.array(loss.item()))
 
-            batch_loss = np.array(batch_losses).mean(axis=0)
-            print(f"  - test loss:  {batch_loss}")
-            test_losses.append(batch_loss)
+            epoch_loss = np.array(epoch_losses).mean(axis=0)
+            test_losses.append(epoch_loss)
+            logger.info("epoch {} (test) loss: {:.6f}".format(
+                epoch+1,
+                epoch_loss / len(data)
+            ))
 
     return train_losses, test_losses

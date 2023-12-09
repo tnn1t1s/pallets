@@ -1,10 +1,13 @@
 import os
+import logging
 import datetime
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+
+from ..logging import logger
 
 
 class VAE(nn.Module):
@@ -148,9 +151,13 @@ class Loss(nn.Module):
 
 
 def train(
-        device, model, criterion, train_loader, test_loader, learn_rate=1e-3,
-        epochs=5
+    device, model, criterion, train_loader, test_loader, learn_rate=1e-3,
+    epochs=5
 ):
+    """
+    Variational Autoencoder focused training loop. Returns the loss information
+    collected across epochs.
+    """
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     train_losses = []
     test_losses = []
@@ -159,37 +166,36 @@ def train(
     criterion.to(device)
 
     for epoch in range(epochs):
-        batch_losses = []
-        train_loss = 0
+        epoch_losses = []
+
         for batch_idx, batch_data in enumerate(train_loader):
             inputs, labels = batch_data
             optimizer.zero_grad()
 
-            recon_batch, mu, logvar = model(inputs, labels)
-            loss = criterion(recon_batch, inputs, mu, logvar)
-            train_loss += loss.item()
+            reconstruction, mu, logvar = model(inputs, labels)
+            loss = criterion(reconstruction, inputs, mu, logvar)
 
             loss.backward()
             optimizer.step()
-            batch_losses.append(np.array(loss.item()))
+            epoch_losses.append(np.array(loss.item()))
 
             if batch_idx % 100 == 0:
-                print(datetime.datetime.now().isoformat(), end=" ")
-                print('epoch {} ({:.0f}%)\t loss: {:.6f}'.format(
+                logger.info('epoch {} ({}%) loss: {:.6f}'.format(
                     epoch+1,
-                    100. * batch_idx / len(train_loader),
-                    loss.item() / len(batch_data)), flush=True)
+                    str(100 * batch_idx // len(train_loader)).rjust(3),
+                    np.array(epoch_losses).mean(axis=0) / len(batch_data)
+                ))
 
-        batch_loss = np.array(batch_losses).mean(axis=0)
-        print(datetime.datetime.now().isoformat(), end=" ")
-        print('epoch {} (100%)\t loss: {:.6f}'.format(
+        epoch_loss = np.array(epoch_losses).mean(axis=0)
+        train_losses.append(epoch_loss)
+        logger.info('epoch {} (100%) loss: {:.6f}'.format(
             epoch+1,
-            train_loss / len(train_loader.dataset.train_idx)), flush=True)
-        train_losses.append(batch_loss)
+            epoch_loss / len(batch_data)
+        ))
 
         model.eval()
         with torch.no_grad():
-            batch_losses = []
+            epoch_losses = []
 
             test_loss = 0
             for data in test_loader:
@@ -198,14 +204,14 @@ def train(
                 loss = criterion(recon, inputs, mu, logvar)
                 test_loss += loss.item()
 
-                batch_losses.append(np.array(loss.item()))
+                epoch_losses.append(np.array(loss.item()))
 
-            batch_loss = np.array(batch_losses).mean(axis=0)
-            print(datetime.datetime.now().isoformat(), end=" ")
-            print("epoch {} test\t loss: {:.6f}".format(
+            epoch_loss = np.array(epoch_losses).mean(axis=0)
+            test_losses.append(epoch_loss)
+            logger.info("epoch {} (test) loss: {:.6f}".format(
                 epoch+1,
-                test_loss / len(test_loader.dataset.test_idx)), flush=True)
-            test_losses.append(batch_loss)
+                epoch_loss / len(data)
+            ))
 
     return train_losses, test_losses
 
