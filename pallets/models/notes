@@ -1,3 +1,5 @@
+## On Hot Encoding (categorical classification) in the learning problem.
+
 While you can modify a Variational Autoencoder (VAE) by applying an argmax across the 
 color channel to automatically convert the output probabilities into a one-hot encoded vector
 where only the maximum probability gets a value of 1, it's important to note that this operation 
@@ -56,5 +58,16 @@ class VAE_Decoder(nn.Module):
 In this example, gumbel_softmax is a function that applies the Gumbel-Softmax operation. 
 You can adjust the temperature parameter based on your needs (lower temperatures make the output 
 closer to one-hot). The hard parameter controls whether to use the straight-through estimator. 
-During training, you might set hard=False and 
-use a higher temperature. For inference, set hard=True and use a lower temperature to get a one-hot encoded output.
+During training, you might set hard=False and  use a higher temperature. For inference, set hard=True 
+and use a lower temperature to get a one-hot encoded output.
+
+### Reference
+"Categorical Reparameterization with Gumbel-Softmax" Eric Jang, Shixiang Gu, and Ben Poole. 
+This paper introduces the Gumbel-Softmax distribution as a continuous distribution over the 
+simplex that can approximate samples from a categorical distribution. The paper demonstrates 
+its utility in learning discrete latent variable models.
+Another key paper is:
+
+"The Concrete Distribution: A Continuous Relaxation of Discrete Random Variables" Chris J. Maddison, Andriy Mnih, and Yee Whye Teh. 
+This paper independently introduces a similar concept known as the Concrete distribution, which is essentially the same 
+as the Gumbel-Softmax distribution.
