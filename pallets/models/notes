@@ -1,7 +1,8 @@
 While you can modify a Variational Autoencoder (VAE) by applying an argmax across the 
-color channel to automatically convert the output probabilities into a one-hot encoded vectorwhere only the maximum 
-probability gets a value of 1, it's important to note that this operation is non-differentiable, 
-which means it can't be used directly during the training phase if gradients need to be computed.
+color channel to automatically convert the output probabilities into a one-hot encoded vector
+where only the maximum probability gets a value of 1, it's important to note that this operation 
+is non-differentiable, which means it can't be used directly during the training phase if gradients 
+need to be computed.
 
 To implement this in a way that's compatible with training, you can use a "Gumbel-Softmax" 
 trick or a "Straight-Through Gumbel-Softmax Estimator". These methods provide a 
