@@ -26,13 +26,10 @@ class CPunksDataset(Dataset):
     """
     SIZE = 10000
 
-    def __init__(self, device=None, test_size=0):
+    def __init__(self, test_size=0):
         self._images = [self._load_punk(i) for i in range(self.SIZE)]
         split_idx = split_dataset(self.SIZE, test_size)
         self.train_idx, self.test_idx = split_idx
-        self.device = device
-        if device is None:
-            self.device = torch.device("cpu")
 
     def _load_punk(self, i):
         return images.get_punk_tensor(i)
@@ -41,7 +38,7 @@ class CPunksDataset(Dataset):
         return len(self._images)
 
     def __getitem__(self, idx):
-        image = self._images[idx].to(self.device)
+        image = self._images[idx]
         return image
 
 
@@ -58,6 +55,6 @@ class CPunksAndLabelsDataset(CPunksDataset):
             self._labels.append(t)
 
     def __getitem__(self, idx):
-        image = self._images[idx].to(self.device)
-        labels = self._labels[idx].to(self.device)
+        image = self._images[idx]
+        labels = self._labels[idx]
         return image, labels

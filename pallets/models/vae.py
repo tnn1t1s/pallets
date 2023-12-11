@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from ..logging import logger
+from ..logging import logger, log_train_config
 
 
 class VAE(nn.Module):
@@ -158,10 +158,7 @@ def train(
     Variational Autoencoder focused training loop. Returns the loss information
     collected across epochs.
     """
-    logger.info(f"model: {model.__class__.__name__}")
-    logger.info(f"criterion: {criterion.__class__.__name__}")
-    logger.info(f"learn rate: {learn_rate}")
-    logger.info(f"epochs: {epochs}")
+    log_train_config(model, criterion, epochs, learn_rate)
 
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     train_losses = []
@@ -175,6 +172,8 @@ def train(
 
         for batch_idx, batch_data in enumerate(train_loader):
             inputs, labels = batch_data
+            inputs = inputs.to(device)
+            labels = labels.to(device)
             optimizer.zero_grad()
 
             reconstruction, mu, logvar = model(inputs, labels)
@@ -205,6 +204,8 @@ def train(
             test_loss = 0
             for data in test_loader:
                 inputs, labels = data
+                inputs = inputs.to(device)
+                labels = labels.to(device)
                 recon, mu, logvar = model(inputs, labels)
                 loss = criterion(recon, inputs, mu, logvar)
                 test_loss += loss.item()

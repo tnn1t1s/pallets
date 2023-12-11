@@ -6,7 +6,7 @@ import torch.optim as optim
 
 
 from .base import RGBA_CHANNELS, ONE_HOT_CHANNELS
-from ..logging import logger
+from ..logging import logger, log_train_config
 
 
 class NaiveRGBAAutoencoder(nn.Module):
@@ -130,10 +130,7 @@ def train(
     Autoencoder focused training loop. Returns the loss information collected
     across epochs.
     """
-    logger.info(f"model: {model.__class__.__name__}")
-    logger.info(f"criterion: {criterion.__class__.__name__}")
-    logger.info(f"learn rate: {learn_rate}")
-    logger.info(f"epochs: {epochs}")
+    log_train_config(model, criterion, epochs, learn_rate)
 
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     train_losses = []
@@ -146,6 +143,7 @@ def train(
         epoch_losses = []
 
         for batch_idx, batch_data in enumerate(train_loader):
+            data = batch_data.to(device)
             reconstruction = model(data)
             loss = criterion(reconstruction, data)
 

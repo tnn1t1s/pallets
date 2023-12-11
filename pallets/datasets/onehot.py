@@ -110,7 +110,6 @@ class OneHotEncodedImageDataset(CPunksDataset):
     def __getitem__(self, idx):
         image = self._images[idx]
         image = rgba_to_one_hot(image, self.mapper)
-        image = image.to(self.device)
         return image
 
 
@@ -125,5 +124,4 @@ class OneHotAndLabelsDataset(CPunksAndLabelsDataset):
     def __getitem__(self, idx):
         image, labels = super(OneHotAndLabelsDataset, self).__getitem__(idx)
         image = rgba_to_one_hot(image, self.mapper)
-        image = image.to(self.device)
         return image, labels

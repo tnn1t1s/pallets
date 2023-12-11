@@ -126,5 +126,4 @@ class MPOneHotEncodedImageDataset(MPPunksDataset):
     def __getitem__(self, idx):
         image = self._images[idx]
         image = mp_rgba_to_one_hot(image, self.mapper)
-        image = image.to(self.device)
         return image
