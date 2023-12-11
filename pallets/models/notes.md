@@ -26,6 +26,8 @@ you use a straight-through estimator, which essentially treats the Gumbel-Softma
 This allows the gradients to flow through the non-differentiable argmax operation.
 
 Code Example:
+
+```python
 import torch
 import torch.nn.functional as F
 
@@ -53,7 +55,7 @@ class VAE_Decoder(nn.Module):
         # ... pass through layers ...
         logits = self.output_layer(z)  # Assume this is the output layer before applying Gumbel-Softmax
         return gumbel_softmax(logits, temperature=0.5, hard=True)  # Set hard=True for inference
-
+```
 
 In this example, gumbel_softmax is a function that applies the Gumbel-Softmax operation. 
 You can adjust the temperature parameter based on your needs (lower temperatures make the output 
@@ -62,14 +64,14 @@ During training, you might set hard=False and  use a higher temperature. For inf
 and use a lower temperature to get a one-hot encoded output.
 
 ### Reference
-("Categorical Reparameterization with Gumbel-Softmax" Eric Jang, Shixiang Gu, and Ben Poole, 2022)
-[https://openreview.net/forum?id=rkE3y85ee]
+["Categorical Reparameterization with Gumbel-Softmax" Eric Jang, Shixiang Gu, and Ben Poole, 2022]
+(https://openreview.net/forum?id=rkE3y85ee])
 This paper introduces the Gumbel-Softmax distribution as a continuous distribution over the 
 simplex that can approximate samples from a categorical distribution. The paper demonstrates 
 its utility in learning discrete latent variable models.
 
-("The Concrete Distribution: A Continuous Relaxation of Discrete Random Variables" Chris J. Maddison, Andriy Mnih, and Yee Whye Teh, 2022)
-[https://openreview.net/forum?id=S1jE5L5gl]
+["The Concrete Distribution: A Continuous Relaxation of Discrete Random Variables" Chris J. Maddison, Andriy Mnih, and Yee Whye Teh, 2022]
+(https://openreview.net/forum?id=S1jE5L5gl)
 This paper independently introduces a similar concept known as the Concrete distribution, which is essentially the same 
 as the Gumbel-Softmax distribution.
 
