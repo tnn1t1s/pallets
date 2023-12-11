@@ -11,7 +11,7 @@ from pallets import images as I, datasets as DS, models as M, logging as L
 USE_GPU = True
 LOG_LEVEL = 'INFO'
 TEST_SIZE = 1000
-EPOCHS = 3
+EPOCHS = 60
 LR = 1e-03
 ###
 
@@ -58,4 +58,4 @@ train_losses, test_losses = M.vae.train(
 )
 
 
-M.save('labeled_vae', model, train_losses, test_losses)
+M.save('home_labeled_vae_1', model, train_losses, test_losses)
