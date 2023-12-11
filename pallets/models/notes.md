@@ -64,14 +64,13 @@ During training, you might set hard=False and  use a higher temperature. For inf
 and use a lower temperature to get a one-hot encoded output.
 
 ### Reference
-["Categorical Reparameterization with Gumbel-Softmax" Eric Jang, Shixiang Gu, and Ben Poole, 2022]
-(https://openreview.net/forum?id=rkE3y85ee])
+
+["Categorical Reparameterization with Gumbel-Softmax" Eric Jang, Shixiang Gu, and Ben Poole, 2022](https://openreview.net/forum?id=rkE3y85ee)
 This paper introduces the Gumbel-Softmax distribution as a continuous distribution over the 
 simplex that can approximate samples from a categorical distribution. The paper demonstrates 
 its utility in learning discrete latent variable models.
 
-["The Concrete Distribution: A Continuous Relaxation of Discrete Random Variables" Chris J. Maddison, Andriy Mnih, and Yee Whye Teh, 2022]
-(https://openreview.net/forum?id=S1jE5L5gl)
+["The Concrete Distribution: A Continuous Relaxation of Discrete Random Variables" Chris J. Maddison, Andriy Mnih, and Yee Whye Teh, 2022](https://openreview.net/forum?id=S1jE5L5gl)
 This paper independently introduces a similar concept known as the Concrete distribution, which is essentially the same 
 as the Gumbel-Softmax distribution.
 
@@ -80,4 +79,4 @@ Early work using a discrete latent space augmented with auxiliary continuous var
 Substantially different than ^^^ and also a difficult paper to read that would be very hard to reproduce.
 
 [Yoshua Bengio, Nicholas Leonard, and Aaron Courville. Estimating or propagating gradients ´
-through stochastic neurons for conditional computation.](
+through stochastic neurons for conditional computation.](https://arxiv.org/abs/1308.3432)
