@@ -33,3 +33,16 @@ def init_logger(level="INFO", timestamp=False):
     logging.info("pallets v0.1")
     return logger
 
+
+def log_train_config(model, criterion, epochs, learn_rate):
+    """
+    Logs basic elements of a training config using a consistent format.
+    """
+    logger.info(
+        f"model: {model.__class__.__module__}.{model.__class__.__name__}"
+    )
+    logger.info(
+        f"criterion: {criterion.__class__.__module__}.{criterion.__class__.__name__}"
+    )
+    logger.info(f"learn rate: {learn_rate}")
+    logger.info(f"epochs: {epochs}")
