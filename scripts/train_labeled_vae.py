@@ -13,6 +13,7 @@ LOG_LEVEL = 'INFO'
 TEST_SIZE = 1000
 EPOCHS = 60
 LR = 1e-03
+BATCH_SIZE = 32
 ###
 
 
@@ -31,14 +32,13 @@ dataset = DS.OneHotAndLabelsDataset(mapper, test_size=TEST_SIZE)
 train_sampler = SubsetRandomSampler(dataset.train_idx)
 test_sampler = SubsetRandomSampler(dataset.test_idx)
 
-batch_size = 32
 num_workers = 0
 
 train_loader = DataLoader(
-    dataset, batch_size=batch_size, sampler=train_sampler, num_workers=num_workers
+    dataset, batch_size=BATCH_SIZE, sampler=train_sampler, num_workers=num_workers
 )
 test_loader = DataLoader(
-    dataset, batch_size=batch_size, sampler=test_sampler, num_workers=num_workers
+    dataset, batch_size=BATCH_SIZE, sampler=test_sampler, num_workers=num_workers
 )
 
 num_labels = len(dataset._labels[0])
