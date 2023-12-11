@@ -27,7 +27,7 @@ logger.info("preparing data loaders")
 
 all_colors = I.get_punk_colors()
 mapper = DS.ColorOneHotMapper(all_colors)
-dataset = DS.OneHotAndLabelsDataset(mapper, device=device, test_size=TEST_SIZE)
+dataset = DS.OneHotAndLabelsDataset(mapper, test_size=TEST_SIZE)
 train_sampler = SubsetRandomSampler(dataset.train_idx)
 test_sampler = SubsetRandomSampler(dataset.test_idx)
 
@@ -48,8 +48,8 @@ num_labels = len(dataset._labels[0])
 
 logger.info("starting model training")
 
-model = M.vae.LabeledVAE(222, (64, 32), 20, num_labels).to(device)
-criterion = M.vae.Loss().to(device)
+model = M.vae.LabeledVAE(222, (64, 32), 20, num_labels)
+criterion = M.vae.Loss()
 
 
 train_losses, test_losses = M.vae.train(
