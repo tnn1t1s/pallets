@@ -45,13 +45,25 @@ def save(modelname, model, train_losses, test_losses):
     logger.info(f"training losses saved to {metapath}")
 
 
-def load(filename):
+def load(modelname, device):
     """
     Loads model from `saved/<filename>`
     """
     models_dir = _saved_path()
-    filepath = os.path.join(models_dir, filename)
-    return torch.load(filepath)
+    modelpath = os.path.join(models_dir, f'{modelname}.pkl')
+    metapath = os.path.join(models_dir, f'{modelname}.json')
+
+    model = torch.load(modelpath)
+    model = model.to(device)
+    logger.info(f"model blob loaded from {modelpath}")
+
+    with open(metapath, 'r') as f:
+        data = json.load(f)
+        train_losses = data['train_losses']
+        test_losses = data['test_losses']
+    logger.info(f"training losses loaded from {modelpath}")
+
+    return model, train_losses, test_losses
 
 
 def get_device(require_gpu=True):
