@@ -76,3 +76,6 @@ as the Gumbel-Softmax distribution.
 [Discrete Variational Autoencoders, Vae 2016](https://arxiv.org/abs/1609.02200)
 Early work using a discrete latent space augmented with auxiliary continuous variables, a hierarchical posterior, and a RBM prior. 
 Substantially different than ^^^ and also a difficult paper to read that would be very hard to reproduce.
+
+[Yoshua Bengio, Nicholas Leonard, and Aaron Courville. Estimating or propagating gradients ´
+through stochastic neurons for conditional computation.](
