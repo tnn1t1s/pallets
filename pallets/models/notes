@@ -72,3 +72,7 @@ its utility in learning discrete latent variable models.
 [https://openreview.net/forum?id=S1jE5L5gl]
 This paper independently introduces a similar concept known as the Concrete distribution, which is essentially the same 
 as the Gumbel-Softmax distribution.
+
+[Discrete Variational Autoencoders, Vae 2016](https://arxiv.org/abs/1609.02200)
+Early work using a discrete latent space augmented with auxiliary continuous variables, a hierarchical posterior, and a RBM prior. 
+Substantially different than ^^^ and also a difficult paper to read that would be very hard to reproduce.
