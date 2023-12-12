@@ -120,10 +120,10 @@ class MPOneHotEncodedImageDataset(MPPunksDataset):
     Pytorch dataset that provides images in one-hot encoded form
     """
     def __init__(self, mapper, *args, **kwargs):
-        super(MPOneHotEncodedImageDataset, self).__init__(*args, **kwargs)
+        # mapper before super().init
         self.mapper = mapper
+        super(MPOneHotEncodedImageDataset, self).__init__(*args, **kwargs)
 
-    def __getitem__(self, idx):
-        image = self._images[idx]
-        image = mp_rgba_to_one_hot(image, self.mapper)
-        return image
+    def _load_punk(self, i):
+        image = images.get_punk_tensor(i)
+        return mp_rgba_to_one_hot(image, self.mapper)

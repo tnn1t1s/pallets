@@ -143,7 +143,8 @@ def train(
         epoch_losses = []
 
         for batch_idx, batch_data in enumerate(train_loader):
-            data = batch_data.to(device)
+            data, _ = batch_data
+            data = data.to(device)
             reconstruction = model(data)
             loss = criterion(reconstruction, data)
 

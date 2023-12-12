@@ -28,7 +28,7 @@ logger.info("preparing data loaders")
 
 all_colors = I.get_punk_colors()
 mapper = DS.ColorOneHotMapper(all_colors)
-dataset = DS.OneHotAndLabelsDataset(mapper, test_size=TEST_SIZE)
+dataset = DS.FastOneHotCPunksDataset(device, mapper, test_size=TEST_SIZE)
 train_sampler = SubsetRandomSampler(dataset.train_idx)
 test_sampler = SubsetRandomSampler(dataset.test_idx)
 

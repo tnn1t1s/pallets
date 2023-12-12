@@ -1,11 +1,11 @@
 from .base import (
     CPunksDataset,
-    CPunksAndLabelsDataset
+    FastCPunksDataset
 )
 
 from .onehot import (
-    OneHotEncodedImageDataset,
-    OneHotAndLabelsDataset,
+    OneHotCPunksDataset,
+    FastOneHotCPunksDataset,
     ColorOneHotMapper,
     rgba_to_one_hot,
     one_hot_to_rgba
@@ -21,9 +21,9 @@ from .mponehot import (
 
 __all__ = [
     CPunksDataset,
-    CPunksAndLabelsDataset,
-    OneHotEncodedImageDataset,
-    OneHotAndLabelsDataset,
+    FastCPunksDataset,
+    OneHotCPunksDataset,
+    FastOneHotCPunksDataset,
     ColorOneHotMapper,
     rgba_to_one_hot,
     one_hot_to_rgba

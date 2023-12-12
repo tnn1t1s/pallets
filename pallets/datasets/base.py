@@ -28,33 +28,37 @@ class CPunksDataset(Dataset):
 
     def __init__(self, test_size=0):
         self._images = [self._load_punk(i) for i in range(self.SIZE)]
+        self._labels = self._load_labels()
         split_idx = split_dataset(self.SIZE, test_size)
         self.train_idx, self.test_idx = split_idx
 
     def _load_punk(self, i):
         return images.get_punk_tensor(i)
+    
+    def _load_labels(self):    
+        all_labels = json.load(open(CPUNKS_LABELS))
+        labels = []
+        for _,label in all_labels.items():
+            t = torch.tensor([v for _,v in label.items()])
+            labels.append(t)
+        return labels
 
     def __len__(self):
         return len(self._images)
 
     def __getitem__(self, idx):
         image = self._images[idx]
-        return image
-
-
-class CPunksAndLabelsDataset(CPunksDataset):
-    """
-    Same thing as CPunksData, but also loads the label data
-    """
-    def __init__(self, *args, **kwargs):
-        super(CPunksAndLabelsDataset, self).__init__(*args, **kwargs)
-        all_labels = json.load(open(CPUNKS_LABELS))
-        self._labels = []
-        for _,label in all_labels.items():
-            t = torch.tensor([v for _,v in label.items()])
-            self._labels.append(t)
-
-    def __getitem__(self, idx):
-        image = self._images[idx]
         labels = self._labels[idx]
         return image, labels
+
+
+class FastCPunksDataset(CPunksDataset):
+    """
+    Same as CPunksDataset, but puts everything on the GPU
+    """
+    def __init__(self, device, *a, **kw):
+        super(FastCPunksDataset, self).__init__(*a, **kw)
+        # put data on GPU
+        self.device = device
+        self._images = torch.stack(self._images, 0).to(self.device)
+        self._labels = torch.stack(self._labels, 0).to(self.device)

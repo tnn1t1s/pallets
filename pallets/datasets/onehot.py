@@ -1,6 +1,7 @@
 import torch
 
-from .base import CPunksDataset, CPunksAndLabelsDataset, CPUNKS_LABELS
+from .base import CPunksDataset, FastCPunksDataset
+from .. import images
 
 
 def make_one_hot_vector(index, length):
@@ -99,29 +100,29 @@ def rgba_to_one_hot(image, mapper):
     return one_hot_encoded_image
 
 
-class OneHotEncodedImageDataset(CPunksDataset):
+class OneHotCPunksDataset(CPunksDataset):
     """
     Pytorch dataset that provides images in one-hot encoded form
     """
     def __init__(self, mapper, *args, **kwargs):
-        super(OneHotEncodedImageDataset, self).__init__(*args, **kwargs)
+        # mapper before super().init
         self.mapper = mapper
+        super(OneHotCPunksDataset, self).__init__(*args, **kwargs)
 
-    def __getitem__(self, idx):
-        image = self._images[idx]
-        image = rgba_to_one_hot(image, self.mapper)
-        return image
+    def _load_punk(self, i):
+        if i % 100 == 0:
+            print(i)
+        image = images.get_punk_tensor(i)
+        return rgba_to_one_hot(image, self.mapper)
+    
 
-
-class OneHotAndLabelsDataset(CPunksAndLabelsDataset):
+class FastOneHotCPunksDataset(OneHotCPunksDataset):
     """
-    Same thing as OneHotEncodedImageDataset, but also loads the label data
+    Same as OneHotCPunksDataset, but puts everything on the GPU
     """
-    def __init__(self, mapper, *args, **kwargs):
-        super(OneHotAndLabelsDataset, self).__init__(*args, **kwargs)
-        self.mapper = mapper
-
-    def __getitem__(self, idx):
-        image, labels = super(OneHotAndLabelsDataset, self).__getitem__(idx)
-        image = rgba_to_one_hot(image, self.mapper)
-        return image, labels
+    def __init__(self, device, *args, **kwargs):
+        super(FastOneHotCPunksDataset, self).__init__(*args, **kwargs)
+        # put data on GPU
+        self.device = device
+        self._images = torch.stack(self._images, 0).to(self.device)
+        self._labels = torch.stack(self._labels, 0).to(self.device)
