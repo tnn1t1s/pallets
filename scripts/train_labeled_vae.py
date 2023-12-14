@@ -1,5 +1,6 @@
 import sys
 import os
+import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 
 
@@ -26,21 +27,25 @@ device = M.get_device(require_gpu=USE_GPU)
 
 logger.info("preparing data loaders")
 
-all_colors = I.get_punk_colors()
-mapper = DS.ColorOneHotMapper(all_colors)
-dataset = DS.FastOneHotCPunksDataset(device, mapper, test_size=TEST_SIZE)
-train_sampler = SubsetRandomSampler(dataset.train_idx)
-test_sampler = SubsetRandomSampler(dataset.test_idx)
+if os.path.exists('onehot_ds.pt'):
+    logger.info("- cached dataset")
+    dataset = torch.load('onehot_ds.pt')
+else:
+    logger.info("- generating dataset")
+    all_colors = I.get_punk_colors()
+    mapper = DS.ColorOneHotMapper(all_colors)
+    dataset = DS.FastOneHotCPunksDataset(device, mapper, test_size=TEST_SIZE)
+    torch.save(dataset, 'onehot_ds.pt')
 
 num_workers = 0
-
+train_sampler = SubsetRandomSampler(dataset.train_idx)
 train_loader = DataLoader(
     dataset, batch_size=BATCH_SIZE, sampler=train_sampler, num_workers=num_workers
 )
+test_sampler = SubsetRandomSampler(dataset.test_idx)
 test_loader = DataLoader(
     dataset, batch_size=BATCH_SIZE, sampler=test_sampler, num_workers=num_workers
 )
-
 num_labels = len(dataset._labels[0])
 
 
