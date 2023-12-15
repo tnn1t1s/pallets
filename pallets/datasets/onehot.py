@@ -110,8 +110,6 @@ class OneHotCPunksDataset(CPunksDataset):
         super(OneHotCPunksDataset, self).__init__(*args, **kwargs)
 
     def _load_punk(self, i):
-        if i % 100 == 0:
-            print(i)
         image = images.get_punk_tensor(i)
         return rgba_to_one_hot(image, self.mapper)
     
