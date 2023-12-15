@@ -26,8 +26,6 @@ class CPunksDataset(Dataset):
     """
     Pytorch dataset that provides all images from cpunks-10k as torch tensors
     """
-    SIZE = 10000
-
     def __init__(self, labels_file=CPUNKS_LABELS, test_size=0):
         self._images = self._load_punks()
         self._labels = self._load_labels(labels_file)
