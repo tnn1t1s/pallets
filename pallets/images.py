@@ -8,6 +8,9 @@ from torchvision.transforms.functional import pil_to_tensor
 CPUNKS_DATA_DIR = "../../cpunks-10k/cpunks/data"
 CPUNKS_IMAGE_DIR = "../../cpunks-10k/cpunks/images/training"
 
+# total number of punks
+CPUNKS_SIZE = 10000
+
 
 def get_punk_path(id):
     return f"{CPUNKS_IMAGE_DIR}/punk{id:#04d}.png"
@@ -32,22 +35,22 @@ def get_punk_tensor(id):
     return pil_to_tensor(image) / 255
 
 
-def one_image_colors(img_datum):
+def one_image_colors(img):
     """
     Returns an array of unique colors found in an image array
     """
-    img_datum = img_datum.reshape(img_datum.shape[0], -1)
-    uniques = torch.unique(img_datum, dim=1)
+    img = img.reshape(img.shape[0], -1)
+    uniques = torch.unique(img, dim=1)
 
     return uniques.T
 
 
-def many_image_colors(img_datas):
+def many_image_colors(imgs):
     """
     Returns an array of unique colors found in an array of images arrays
     """
     img_data = torch.concatenate(
-        [i.reshape(i.shape[0], -1) for i in img_datas],
+        [i.reshape(i.shape[0], -1) for i in imgs],
         axis=-1
     )
     uniques = torch.unique(img_data, dim=1)
@@ -56,6 +59,7 @@ def many_image_colors(img_datas):
 
 
 def get_punk_colors():
-    punks = [get_punk_tensor(i) for i in range(10000)]
+    punks = [get_punk_tensor(i) for i in range(CPUNKS_SIZE)]
     colors = many_image_colors(punks)
     return colors
+
