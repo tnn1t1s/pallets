@@ -63,3 +63,51 @@ def get_punk_colors():
     colors = many_image_colors(punks)
     return colors
 
+
+def has_colors(img_colors, colors):
+    """
+    Checks all colors in img_colors for a match with `colors`
+    """
+    matches = []
+    for ic in img_colors:
+        for c in colors:
+            if (ic == c).tolist() == [True, True, True, True]:
+                matches.append(ic)
+    return matches
+
+
+def find_pixels(img, colors):
+    """
+    Finds every pixel in `img` with color values that matches `colors`
+    """
+    img = img.reshape(img.shape[0], -1)
+    y_pixels = []
+    for pixel_idx in range(img.shape[1]):
+        pixel = torch.tensor([
+            img[0][pixel_idx],
+            img[1][pixel_idx],
+            img[2][pixel_idx],
+            img[3][pixel_idx],
+        ])
+        coords = (pixel_idx // 24), (pixel_idx % 24)
+        matches = has_colors(pixel.unsqueeze(0), colors)
+        if len(matches) > 0:
+            y_pixels.append((coords, matches[0]))
+    return y_pixels
+
+
+def map_colors(imgs, colors):
+    """
+    Finds every pixel in `imgs` with a color value that matches `colors` and
+    keeps a list of every instance found, including duplicates. A tally of
+    occurrences per pixel is also created for use in heatmaps.
+    """
+    occurrences = dict()
+    presence  = dict()
+    for img in imgs:
+        matches = find_pixels(img, colors)
+        for m in matches:
+            coords, yellow = m
+            occurrences[coords] = occurrences.get(coords, 0) + 1
+            presence[coords] = presence.get(coords, []) + [yellow]
+    return occurrences, presence
