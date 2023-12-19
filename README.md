@@ -33,4 +33,4 @@ pip install -r requirements.txt
 3. [Generation with VAE](nb/GenerationWithVAE.ipynb): Train a variational autoencoder to generate new images.
 4. [Add Labels to VAE](nb/AddLabelsToVAE.ipynb): Train a VAE with images & labeled data to add ability to generate particular features.
 5. [Find Errors in Earring Label](nb/FindEarrings.ipynb): Explore the 'earring' label in the dataset and improve its quality.
-
+6. [Evaluate Improved Earring Label](nb/EvalNewEarrings.ipynb): This notebook introduces the use of Gumbel-Softmax in the VAE, and it uses a labels file with an improved earring label, to generate images with an accurate golden earring.
