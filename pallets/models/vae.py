@@ -152,7 +152,7 @@ class Loss(nn.Module):
 
 def train(
     device, model, criterion, train_loader, test_loader, learn_rate=1e-3,
-    epochs=5
+    epochs=5, with_labels=False
 ):
     """
     Variational Autoencoder focused training loop. Returns the loss information
@@ -167,18 +167,29 @@ def train(
     model.to(device)
     criterion.to(device)
 
+    # Helper function to manage whether or not labels are used
+    def handle_params(batch_data):
+        if with_labels:
+            inputs, labels = batch_data
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            model_args = (inputs, labels)
+        else:
+            inputs, _ = batch_data
+            inputs = inputs.to(device)
+            model_args = (inputs,)
+        return model_args
+
     for epoch in range(epochs):
         epoch_losses = []
 
         for batch_idx, batch_data in enumerate(train_loader):
-            inputs, labels = batch_data
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+            model_args = handle_params(batch_data)
+            inputs = model_args[0]  # after device is mapped
             optimizer.zero_grad()
+            reconstruction, mu, logvar = model(*model_args)
 
-            reconstruction, mu, logvar = model(inputs, labels)
             loss = criterion(reconstruction, inputs, mu, logvar)
-
             loss.backward()
             optimizer.step()
             epoch_losses.append(np.array(loss.item()))
@@ -202,21 +213,20 @@ def train(
             epoch_losses = []
 
             test_loss = 0
-            for data in test_loader:
-                inputs, labels = data
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-                recon, mu, logvar = model(inputs, labels)
-                loss = criterion(recon, inputs, mu, logvar)
-                test_loss += loss.item()
+            for batch_data in test_loader:
+                model_args = handle_params(batch_data)
+                inputs = model_args[0]  # after device is mapped
+                reconstruction, mu, logvar = model(*model_args)
 
+                loss = criterion(reconstruction, inputs, mu, logvar)
+                test_loss += loss.item()
                 epoch_losses.append(np.array(loss.item()))
 
             epoch_loss = np.array(epoch_losses).mean(axis=0)
             test_losses.append(epoch_loss)
             logger.info("epoch {} (test) loss: {:.6f}".format(
                 epoch+1,
-                epoch_loss / len(data)
+                epoch_loss / len(batch_data)
             ))
 
     return train_losses, test_losses
