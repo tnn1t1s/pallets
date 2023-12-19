@@ -32,5 +32,5 @@ pip install -r requirements.txt
 2. [RGBA vs One Hot](nb/RGBAvsOneHot.ipynb): Train and compare 4 autoencoders: 2 with RGBA colors and 2 with one hot encoded colors.
 3. [Generation with VAE](nb/GenerationWithVAE.ipynb): Train a variational autoencoder to generate new images.
 4. [Add Labels to VAE](nb/AddLabelsToVAE.ipynb): Train a VAE with images & labeled data to add ability to generate particular features.
-5. [Fix Earring Label](nb/FixEarrings.ipynb): Explore the label for earring in the dataset and improve its quality.
+5. [Find Errors in Earring Label](nb/FindEarrings.ipynb): Explore the 'earring' label in the dataset and improve its quality.
 
