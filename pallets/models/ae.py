@@ -171,7 +171,7 @@ def train(
         with torch.no_grad():
             epoch_losses = []
 
-            for data in test_loader:
+            for data, _ in test_loader:
                 data = data.to(device)
                 reconstruction = model(data)
                 loss = criterion(reconstruction, data)
