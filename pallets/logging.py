@@ -20,12 +20,13 @@ def get_log_level(level):
         raise Exception(f"Unrecognized log level: {level}")
 
 
-def init_logger(level="INFO", notebook=False):
+def init_logger(level="INFO", timestamp=False, notebook=False):
     config = { 'format': "%(levelname)s | %(message)s" }
 
     if notebook:
         config['stream'] = sys.stdout
-    else:
+    
+    if timestamp:
         config['format'] = "%(asctime)s | %(levelname)s | %(message)s"
         config['datefmt'] = "%m/%d/%Y %H:%M:%S"
 
