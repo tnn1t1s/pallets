@@ -34,3 +34,7 @@ pip install -r requirements.txt
 4. [Add Labels to VAE](nb/AddLabelsToVAE.ipynb): Train a VAE with images & labeled data to add ability to generate particular features.
 5. [Find Errors in Earring Label](nb/FindEarrings.ipynb): Explore the 'earring' label in the dataset and improve its quality.
 6. [Evaluate Improved Earring Label](nb/EvalNewEarrings.ipynb): This notebook introduces the use of Gumbel-Softmax in the VAE, and it uses a labels file with an improved earring label, to generate images with an accurate golden earring.
+7. [On The Simplex](nb/OnTheSimplex.ipynb): An exploration of the role a simplex can play in ML.
+8. [On The Gumbel](nb/OnTheGumbel.ipynb): An exploration of gumbel-softmax.
+9. [VAE with Gumbel-Softmax](nb/GumbelSoftmax.ipynb): Applying gumbel-softmax to a VAE and investigating results.
+10. [GumbelVAE vs VAE](nb/EvalGumbel.ipynb): Loads up both a LabeledVAE model and a GumbelVAE model and compares generated output for same inputs.
