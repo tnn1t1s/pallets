@@ -1,6 +1,3 @@
-import os
-import logging
-import datetime
 import numpy as np
 import torch
 import torch.nn as nn
@@ -18,9 +15,6 @@ class VAE(nn.Module):
         self.latent_dim = latent_dim
         self.fc_dim = 128
 
-        self.fc_mean = nn.Linear(self.fc_dim, self.latent_dim)
-        self.fc_logvar = nn.Linear(self.fc_dim, self.latent_dim)
-
         self.encode = nn.Sequential(
             nn.Conv2d(
                 self.input_dim, self.hidden_dims[0],
@@ -36,6 +30,9 @@ class VAE(nn.Module):
             nn.Linear(self.hidden_dims[1] * 24 * 24, self.fc_dim),
             nn.ReLU(),
         )
+
+        self.fc_mean = nn.Linear(self.fc_dim, self.latent_dim)
+        self.fc_logvar = nn.Linear(self.fc_dim, self.latent_dim)
 
         self.decode = nn.Sequential(
             nn.Linear(self.latent_dim, self.fc_dim),
@@ -139,7 +136,6 @@ class LabeledVAE(nn.Module):
         return z, mu, logvar
 
 
-
 class Loss(nn.Module):
     """
     Implementing the loss function this way lets us put it on the GPU
@@ -230,4 +226,3 @@ def train(
             ))
 
     return train_losses, test_losses
-
