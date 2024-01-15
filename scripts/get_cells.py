@@ -1,12 +1,17 @@
+#!/usr/bin/env python
+
+import sys
 import nbformat
 
-thenb = '../nb/laebels.ipynb'
 
-f = open(thenb)
+if len(sys.argv) < 2:
+    sys.stderr.write('ERROR: {sys.argv[0]} expected <filename> argument\n')
+    sys.exit(-1)
+
+filename = sys.argv[1]
+
+f = open(filename)
 notebook = nbformat.read(f, as_version=4)
-
-#nb_fixed = nbformat.validator.normalize(nb_corrupted)
-#nbformat.validator.validate(nb_fixed[1])
 
 for cell in notebook['cells']:
     if cell['cell_type'] == 'code':
