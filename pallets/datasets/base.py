@@ -4,9 +4,11 @@ import torch
 from torch.utils.data import Dataset
 
 from .. import images
+from .. import paths
 from ..logging import logger
 
-CPUNKS_LABELS = "../../cpunks-10k/cpunks/data/punks.json"
+
+CPUNKS_LABELS = os.path.join(paths.CPUNKS_ROOT, 'data', 'punks.json')
 
 
 def split_dataset(ds_size, test_size=0):
@@ -26,7 +28,7 @@ class CPunksDataset(Dataset):
     """
     Pytorch dataset that provides all images from cpunks-10k as torch tensors
     """
-    def __init__(self, labels_file=CPUNKS_LABELS, test_size=0):
+    def __init__(self, labels_file=None, test_size=0):
         self._images = self._load_punks()
         self._labels = self._load_labels(labels_file)
         split_idx = split_dataset(images.CPUNKS_SIZE, test_size)
@@ -34,7 +36,7 @@ class CPunksDataset(Dataset):
 
     def _load_punk(self, i):
         return images.get_punk_tensor(i)
-    
+
     def _load_punks(self):
         logger.info(f"loading punk images")
 
@@ -51,13 +53,19 @@ class CPunksDataset(Dataset):
     def _load_labels(self, labels_file):
         logger.info(f"loading punk labels: {labels_file}")
 
-        if not os.path.exists(labels_file):
+        # Look in artifacts dir for label name or fallback to CPUNKS_LABELS
+        if labels_file:
+            labels_file = os.path.join(paths.ARTIFACTS_DIR, labels_file)
+            if not os.path.exists(labels_file):
+                err_msg = f"ERROR: labels file not found {labels_file}"
+                raise Exception(err_msg)
+        else:
             labels_file = CPUNKS_LABELS
         all_labels = json.load(open(labels_file))
 
         labels = []
-        for _,label in all_labels.items():
-            t = torch.tensor([v for _,v in label.items()])
+        for label in all_labels.values():
+            t = torch.tensor([v for v in label.values()])
             labels.append(t)
         return labels
 

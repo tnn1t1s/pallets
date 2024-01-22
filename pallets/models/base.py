@@ -3,34 +3,19 @@ import json
 import torch
 
 from ..logging import logger
+from .. import paths
 
 
 RGBA_CHANNELS = 4
 ONE_HOT_CHANNELS = 222
 
 
-def _saved_path():
-    """
-    Helper function to save and load models from consistent location
-    """
-    parent_dir = __file__
-    for _ in range(3):  # go up three directories
-        parent_dir = os.path.dirname(parent_dir)
-
-    models_dir = os.path.join(parent_dir, 'saved')
-    if not os.path.exists(models_dir):
-        os.mkdir(models_dir)
-
-    return models_dir
-
-
 def save(modelname, model, train_losses, test_losses):
     """
     Saves model as 'saved/<filename>'
     """
-    models_dir = _saved_path()
-    modelpath = os.path.join(models_dir, f'{modelname}.pkl')
-    metapath = os.path.join(models_dir, f'{modelname}.json')
+    modelpath = os.path.join(paths.SAVED_MODELS_DIR, f'{modelname}.pkl')
+    metapath = os.path.join(paths.SAVED_MODELS_DIR, f'{modelname}.json')
 
     torch.save(model, modelpath)
     logger.info(f"model blob saved to {modelpath}")
@@ -49,9 +34,8 @@ def load(modelname, device):
     """
     Loads model from `saved/<filename>`
     """
-    models_dir = _saved_path()
-    modelpath = os.path.join(models_dir, f'{modelname}.pkl')
-    metapath = os.path.join(models_dir, f'{modelname}.json')
+    modelpath = os.path.join(paths.SAVED_MODELS_DIR, f'{modelname}.pkl')
+    metapath = os.path.join(paths.SAVED_MODELS_DIR, f'{modelname}.json')
 
     model = torch.load(modelpath)
     model = model.to(device)

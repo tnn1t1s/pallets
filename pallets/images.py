@@ -3,12 +3,10 @@ import PIL
 import torch
 from torchvision.transforms.functional import pil_to_tensor
 
+from . import paths
 
-# https://github.com/tnn1t1s/cpunks-10k
-CPUNKS_DATA_DIR = "../../cpunks-10k/cpunks/data"
-CPUNKS_IMAGE_DIR = "../../cpunks-10k/cpunks/images/training"
 
-# total number of punks
+CPUNKS_IMAGE_DIR = os.path.join(paths.CPUNKS_ROOT, 'images', 'training')
 CPUNKS_SIZE = 10000
 
 
