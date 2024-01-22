@@ -63,6 +63,9 @@ class CPunksDataset(Dataset):
             labels_file = CPUNKS_LABELS
         all_labels = json.load(open(labels_file))
 
+        # store keys for labels too
+        self._label_keys = [k for k in all_labels["0"].keys()]
+
         labels = []
         for label in all_labels.values():
             t = torch.tensor([v for v in label.values()])
