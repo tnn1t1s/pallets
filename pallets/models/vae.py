@@ -7,6 +7,100 @@ import torch.optim as optim
 from ..logging import logger, log_train_config
 
 
+class VAE(nn.Module):
+    def __init__(self, input_dim, hidden_dim, latent_dim):
+        super(VAE, self).__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.latent_dim = latent_dim
+
+        self.encode = nn.Sequential(
+            nn.Linear(
+                self.input_dim, self.hidden_dim
+            ),
+            nn.LeakyReLU(),
+        )
+
+        self.fc_mean = nn.Linear(self.hidden_dim, self.latent_dim)
+        self.fc_logvar = nn.Linear(self.hidden_dim, self.latent_dim)
+
+        self.decode = nn.Sequential(
+            nn.Linear(
+                self.latent_dim, self.hidden_dim
+            ),
+            nn.LeakyReLU(),
+            nn.Linear(
+                self.hidden_dim, self.input_dim
+            ),
+            nn.Sigmoid(),
+        )
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    def forward(self, x):
+        x = x.view(x.shape[0], -1)
+        x = self.encode(x)
+
+        mu = self.fc_mean(x)
+        logvar = self.fc_logvar(x)
+        z = self.reparameterize(mu, logvar)
+
+        z = self.decode(z)
+        z = z.view(-1, 222, 24, 24)
+        return z, mu, logvar
+
+
+class LabeledVAE(nn.Module):
+    def __init__(self, input_dim, hidden_dim, latent_dim, classes_dim):
+        super(LabeledVAE, self).__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.latent_dim = latent_dim
+        self.classes_dim = classes_dim
+
+        self.encode = nn.Sequential(
+            nn.Linear(
+                self.input_dim + self.classes_dim, self.hidden_dim
+            ),
+            nn.LeakyReLU(),
+        )
+
+        self.fc_mean = nn.Linear(self.hidden_dim, self.latent_dim)
+        self.fc_logvar = nn.Linear(self.hidden_dim, self.latent_dim)
+
+        self.decode = nn.Sequential(
+            nn.Linear(
+                self.latent_dim, self.hidden_dim
+            ),
+            nn.LeakyReLU(),
+            nn.Linear(
+                self.hidden_dim, self.input_dim
+            ),
+            nn.Sigmoid(),
+        )
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    def forward(self, x, labels):
+        x = x.view(x.shape[0], -1)
+        x = torch.cat((x, labels), dim=1)
+        x = self.encode(x)
+
+        mu = self.fc_mean(x)
+        logvar = self.fc_logvar(x)
+        z = self.reparameterize(mu, logvar)
+
+        z = self.decode(z)
+        z = z.view(-1, 222, 24, 24)
+        return z, mu, logvar
+
+
 class ConvVAE(nn.Module):
     def __init__(self, input_dim, hidden_dims, latent_dim):
         super(ConvVAE, self).__init__()
