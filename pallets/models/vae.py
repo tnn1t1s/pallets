@@ -7,44 +7,52 @@ import torch.optim as optim
 from ..logging import logger, log_train_config
 
 
-class VAE(nn.Module):
+class ConvVAE(nn.Module):
     def __init__(self, input_dim, hidden_dims, latent_dim):
-        super(VAE, self).__init__()
+        super(ConvVAE, self).__init__()
         self.input_dim = input_dim
         self.hidden_dims = hidden_dims
         self.latent_dim = latent_dim
-        self.fc_dim = 128
 
         self.encode = nn.Sequential(
             nn.Conv2d(
                 self.input_dim, self.hidden_dims[0],
                 kernel_size=3, stride=1, padding=1
             ),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Conv2d(
                 self.hidden_dims[0], self.hidden_dims[1],
                 kernel_size=3, stride=1, padding=1
             ),
-            nn.ReLU(),
+            nn.LeakyReLU(),
+            nn.Conv2d(
+                self.hidden_dims[1], self.hidden_dims[2],
+                kernel_size=3, stride=1, padding=1
+            ),
+            nn.LeakyReLU(),
             nn.Flatten(),
-            nn.Linear(self.hidden_dims[1] * 24 * 24, self.fc_dim),
-            nn.ReLU(),
         )
 
-        self.fc_mean = nn.Linear(self.fc_dim, self.latent_dim)
-        self.fc_logvar = nn.Linear(self.fc_dim, self.latent_dim)
+        self.fc_mean = nn.Linear(
+            self.hidden_dims[2] * 24 * 24, self.latent_dim
+        )
+        self.fc_logvar = nn.Linear(
+            self.hidden_dims[2] * 24 * 24, self.latent_dim
+        )
 
         self.decode = nn.Sequential(
-            nn.Linear(self.latent_dim, self.fc_dim),
-            nn.ReLU(),
-            nn.Linear(self.fc_dim, self.hidden_dims[1] * 24 * 24),
-            nn.ReLU(),
-            nn.Unflatten(-1, (self.hidden_dims[1], 24, 24)),
+            nn.Linear(self.latent_dim, self.hidden_dims[2] * 24 * 24),
+            nn.Unflatten(-1, (self.hidden_dims[2], 24, 24)),
+            nn.ConvTranspose2d(
+                self.hidden_dims[2], self.hidden_dims[1],
+                kernel_size=3, stride=1, padding=1, output_padding=0
+            ),
+            nn.LeakyReLU(),
             nn.ConvTranspose2d(
                 self.hidden_dims[1], self.hidden_dims[0],
                 kernel_size=3, stride=1, padding=1, output_padding=0
             ),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.ConvTranspose2d(
                 self.hidden_dims[0], self.input_dim,
                 kernel_size=3, stride=1, padding=1, output_padding=0
@@ -68,49 +76,55 @@ class VAE(nn.Module):
         return z, mu, logvar
 
 
-class LabeledVAE(nn.Module):
-    def __init__(self, input_dim, hidden_dims, latent_dim, n_labels):
-        super(LabeledVAE, self).__init__()
+class LabeledConvVAE(nn.Module):
+    def __init__(self, input_dim, hidden_dims, latent_dim, classes_dim):
+        super(LabeledConvVAE, self).__init__()
         self.input_dim = input_dim
         self.hidden_dims = hidden_dims
         self.latent_dim = latent_dim
-        self.n_labels = n_labels
-        self.fc_dim = 128
-
-        self.fc_mean = nn.Linear(
-            self.fc_dim + self.n_labels, self.latent_dim
-        )
-        self.fc_logvar = nn.Linear(
-            self.fc_dim + self.n_labels, self.latent_dim
-        )
+        self.classes_dim = classes_dim
 
         self.encode = nn.Sequential(
             nn.Conv2d(
-                self.input_dim, self.hidden_dims[0],
+                self.input_dim + self.classes_dim, self.hidden_dims[0],
                 kernel_size=3, stride=1, padding=1
             ),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Conv2d(
                 self.hidden_dims[0], self.hidden_dims[1],
                 kernel_size=3, stride=1, padding=1
             ),
-            nn.ReLU(),
+            nn.LeakyReLU(),
+            nn.Conv2d(
+                self.hidden_dims[1], self.hidden_dims[2],
+                kernel_size=3, stride=1, padding=1
+            ),
+            nn.LeakyReLU(),
             nn.Flatten(),
-            nn.Linear(self.hidden_dims[1] * 24 * 24, self.fc_dim),
-            nn.ReLU(),
+        )
+
+        self.fc_mean = nn.Linear(
+            self.hidden_dims[2] * 24 * 24, self.latent_dim
+        )
+        self.fc_logvar = nn.Linear(
+            self.hidden_dims[2] * 24 * 24, self.latent_dim
         )
 
         self.decode = nn.Sequential(
-            nn.Linear(self.latent_dim + self.n_labels, self.fc_dim),
-            nn.ReLU(),
-            nn.Linear(self.fc_dim, self.hidden_dims[1] * 24 * 24),
-            nn.ReLU(),
-            nn.Unflatten(-1, (self.hidden_dims[1], 24, 24)),
+            nn.Linear(
+                self.latent_dim, self.hidden_dims[2] * 24 * 24
+            ),
+            nn.Unflatten(-1, (self.hidden_dims[2], 24, 24)),
+            nn.ConvTranspose2d(
+                self.hidden_dims[2], self.hidden_dims[1],
+                kernel_size=3, stride=1, padding=1, output_padding=0
+            ),
+            nn.LeakyReLU(),
             nn.ConvTranspose2d(
                 self.hidden_dims[1], self.hidden_dims[0],
                 kernel_size=3, stride=1, padding=1, output_padding=0
             ),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.ConvTranspose2d(
                 self.hidden_dims[0], self.input_dim,
                 kernel_size=3, stride=1, padding=1, output_padding=0
@@ -123,26 +137,32 @@ class LabeledVAE(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
+    def encode_labels(self, x, labels):
+        labels = labels.view(x.shape[0], labels.shape[1], 1, 1)
+        ones = torch.ones(
+            x.shape[0], labels.shape[1], x.shape[2], x.shape[3]
+        )
+        ones = ones.to(labels.device)
+        ones = ones * labels
+        x = torch.cat((x, ones), dim=1).to(x.device)
+        return x
+
     def forward(self, x, labels):
+        x = self.encode_labels(x, labels)
         x = self.encode(x)
 
-        x = torch.cat([x, labels], dim=1)
         mu = self.fc_mean(x)
         logvar = self.fc_logvar(x)
         z = self.reparameterize(mu, logvar)
-        z = torch.cat([z, labels], dim=1)
 
         z = self.decode(z)
         return z, mu, logvar
 
 
 class Loss(nn.Module):
-    """
-    Implementing the loss function this way lets us put it on the GPU
-    """
-    def forward(self, reconstructed_x, x, mean, logvar):
-        recon_loss = F.mse_loss(reconstructed_x, x, reduction='sum')
+    def forward(self, recon_x, x, mean, logvar):
         kl_div = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
+        recon_loss = F.binary_cross_entropy(recon_x, x, reduction='sum')
         return recon_loss + kl_div
 
 
