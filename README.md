@@ -2,11 +2,46 @@
 
 pallets is a project to explore pixel art generation in neural networks using toy model building blocks
 
+
 ## Abstract
 
 We explore the application of convolutional autoencoders to generate pixel art. Our approach is twofold: first, we implement a standard RGB-based autoencoder model to understand baseline performance and highlight issues with current approaches - including those using very large generative models.  Second, we introduce a novel one-hot encoded color mapping autoencoder designed to adhere strictly to predefined color palettes, a critical aspect of pixel art.
 
 We demonstrate a dimensionality reduction of the problem alongside order of magnitude performance improvement relative to the aesthetic of pixel art. We then suggest that this can be more broadly applied on larger images, more complex model architectures and ambitious generative pieces. 
+
+
+## Notebooks
+
+### The Dataset
+
+* [Introduction to the Images](nb/dataset/IntroToDSImages.ipynb): Explore the image side of dataset and how we represent it in the models.
+* [Earrings Label](nb/dataset/FindEarrings.ipynb): Address issues with the earrings label.
+
+### Autoencoders
+
+* [AE](nb/ae/AE.ipynb): A basic autoencoder for images with 4 color channels for RGBA
+* [ConvAE](nb/ae/ConvAE.ipynb): A convolutionary form of AE
+* [AEOneHot](nb/ae/AEOneHot.ipynb): A basic autoencoder for images with a one-hot encoded representation of each unique color in the dataset
+* [ConvAEOneHot](nb/ae/ConvAEOneHot.ipynb): A convolutionary for of AEOneHot
+
+### Variational Autoencoders
+
+* [VAE](nb/vae/VAE.ipynb): A basic variational autoencoder for one-hot encoded images
+* [ConvVAE](nb/vae/ConvVAE.ipynb): A convolutionary form of VAE
+* [LabeledVAE](nb/vae/LabeledVAE.ipynb): A labeled form of VAE
+* [LabeledConvVae](nb/vae/LabeledConvVAE.ipynb): A combination convolutionary & labeled form of VAE
+
+### Conditional Variational Autoencoders
+
+* [CVAE](nb/cvae/CVAE.ipynb): A basic conditional variational autoencoder for one-hot encoded images
+* [ConvCVAE](nb/cvae/ConvCVAE.ipynb): A convolutionary form of VAE
+* [LabeledCVAE](nb/cvae/LabeledCVAE.ipynb): A labeled form of VAE
+* [LabeledConvCVae](nb/cvae/LabeledConvCVAE.ipynb): A combination convolutionary & labeled form of VAE
+
+### Gumbel Softmax
+
+* [GSVAE](nb/gumbel/GSVAE.ipynb): A basic variational autoencoder with gumbel softmax reparameterization
+
 
 ## Setup
 
@@ -25,16 +60,3 @@ python -mvenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-
-## Notebooks
-
-1. [Introduction](nb/Introduction.ipynb): Explore the dataset and how it is represented for experiments.
-2. [RGBA vs One Hot](nb/RGBAvsOneHot.ipynb): Train and compare 4 autoencoders: 2 with RGBA colors and 2 with one hot encoded colors.
-3. [Generation with VAE](nb/GenerationWithVAE.ipynb): Train a variational autoencoder to generate new images.
-4. [Add Labels to VAE](nb/AddLabelsToVAE.ipynb): Train a VAE with images & labeled data to add ability to generate particular features.
-5. [Find Errors in Earring Label](nb/FindEarrings.ipynb): Explore the 'earring' label in the dataset and improve its quality.
-6. [Evaluate Improved Earring Label](nb/EvalNewEarrings.ipynb): This notebook introduces the use of Gumbel-Softmax in the VAE, and it uses a labels file with an improved earring label, to generate images with an accurate golden earring.
-7. [On The Simplex](nb/OnTheSimplex.ipynb): An exploration of the role a simplex can play in ML.
-8. [On The Gumbel](nb/OnTheGumbel.ipynb): An exploration of gumbel-softmax.
-9. [VAE with Gumbel-Softmax](nb/GumbelSoftmax.ipynb): Applying gumbel-softmax to a VAE and investigating results.
-10. [GumbelVAE vs VAE](nb/EvalGumbel.ipynb): Loads up both a LabeledVAE model and a GumbelVAE model and compares generated output for same inputs.
