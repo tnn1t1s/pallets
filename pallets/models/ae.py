@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import torch
 import torch.nn as nn
@@ -9,14 +8,14 @@ from .base import RGBA_CHANNELS, ONE_HOT_CHANNELS
 from ..logging import logger, log_train_config
 
 
-class NaiveRGBAAutoencoder(nn.Module):
+class AE(nn.Module):
     """
-    Naive autoencoder for 4 channel RGBA images
+    Autoencoder for 4 channel RGBA images
     """
     DATA_SHAPE = (RGBA_CHANNELS, 24, 24)
 
     def __init__(self):
-        super(NaiveRGBAAutoencoder, self).__init__()
+        super(AE, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Flatten(),
@@ -39,14 +38,14 @@ class NaiveRGBAAutoencoder(nn.Module):
         return x
 
 
-class NaiveOneHotAutoencoder(nn.Module):
+class AEOneHot(nn.Module):
     """
-    Naive autoencoder for one hot encoded color palette
+    Autoencoder for one hot encoded images
     """
     DATA_SHAPE = (ONE_HOT_CHANNELS, 24, 24)
 
     def __init__(self):
-        super(NaiveOneHotAutoencoder, self).__init__()
+        super(AEOneHot, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Flatten(),
@@ -68,12 +67,12 @@ class NaiveOneHotAutoencoder(nn.Module):
         return x
 
 
-class ConvRGBAAutoencoder(nn.Module):
+class ConvAE(nn.Module):
     """
-    CNN autoencoder RGBA images
+    Convolutionary autoencoder for RGBA images
     """
     def __init__(self):
-        super(ConvRGBAAutoencoder, self).__init__()
+        super(ConvAE, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Conv2d(RGBA_CHANNELS, 64, kernel_size=3, stride=1),
@@ -95,12 +94,12 @@ class ConvRGBAAutoencoder(nn.Module):
         return x
 
 
-class ConvOneHotAutoencoder(nn.Module):
+class ConvAEOneHot(nn.Module):
     """
-    CNN autoencoder one hot images
+    Convolutionary Autoencoder for one hot encoded images
     """
     def __init__(self):
-        super(ConvOneHotAutoencoder, self).__init__()
+        super(ConvAEOneHot, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Conv2d(ONE_HOT_CHANNELS, 64, kernel_size=3, stride=1),
@@ -119,7 +118,6 @@ class ConvOneHotAutoencoder(nn.Module):
         x = self.encoder(x)
         x = self.decoder(x)
         return x
-
 
 
 def train(
