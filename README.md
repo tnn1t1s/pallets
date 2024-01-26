@@ -1,6 +1,6 @@
 # Pallets
 
-pallets is a project to explore pixel art generation in neural networks using toy model building blocks
+Pallets is a project to explore pixel art generation in neural networks using toy model building blocks.
 
 
 ## Abstract
@@ -22,7 +22,7 @@ We demonstrate a dimensionality reduction of the problem alongside order of magn
 * [AE](nb/ae/AE.ipynb): A basic autoencoder for images with 4 color channels for RGBA
 * [ConvAE](nb/ae/ConvAE.ipynb): A convolutionary form of AE
 * [AEOneHot](nb/ae/AEOneHot.ipynb): A basic autoencoder for images with a one-hot encoded representation of each unique color in the dataset
-* [ConvAEOneHot](nb/ae/ConvAEOneHot.ipynb): A convolutionary for of AEOneHot
+* [ConvAEOneHot](nb/ae/ConvAEOneHot.ipynb): A convolutionary form of AEOneHot
 
 ### Variational Autoencoders
 
@@ -41,6 +41,12 @@ We demonstrate a dimensionality reduction of the problem alongside order of magn
 ### Gumbel Softmax
 
 * [GSVAE](nb/gumbel/GSVAE.ipynb): A basic variational autoencoder with gumbel softmax reparameterization
+
+### Math Visualizations
+
+* [Visualizing Convolutions](nb/mathviz/VisualizingConvolutions.ipynb): Applies different types of convolutions to graphical representations of an X and an O, and displays an image for every layer of math applied.
+* [Notes On The Simplex](nb/mathviz/NotesOnTheSimplex.ipynb): A visual representation of a simplex, the structure that underlines Gumbel Softmax.
+* [Using Gumbel Softmax](nb/mathviz/UsingGumbelSoftmax.ipynb): An implementation of Eric Jang's gumbel softax (_one of the original authors of Gumbel Softmax_) is compared with the implementation packaged with PyTorch.
 
 
 ## Setup
