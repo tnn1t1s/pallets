@@ -60,6 +60,65 @@ class GSVAE(nn.Module):
         return z, z_y
 
 
+class LabeledGSVAE(nn.Module):
+    def __init__(
+        self, input_dim, hidden_dim, latent_dim, classes_dim, temperature
+    ):
+        super(LabeledGSVAE, self).__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.latent_dim = latent_dim
+        self.classes_dim = classes_dim
+        self.temperature = temperature
+
+        self.encode_1 = nn.Linear(
+            self.input_dim + self.classes_dim, self.hidden_dim
+        )
+        self.encode_2 = nn.Linear(
+            self.hidden_dim, self.latent_dim * self.classes_dim
+        )
+
+        self.decode_1 = nn.Linear(
+            self.latent_dim * self.classes_dim, self.hidden_dim
+        )
+        self.decode_2 = nn.Linear(
+            self.hidden_dim, self.input_dim
+        )
+
+    def encode_targets(self, x, targets):
+        """encode targets into inputs"""
+        x = x.view(x.shape[0], -1)
+        x = torch.cat((x, targets), dim=1)
+        return x
+
+    def encoder(self, x, labels):
+        x = self.encode_targets(x, labels)
+        x = self.encode_1(x)
+        x = F.leaky_relu(x)
+        x = self.encode_2(x)
+        x = F.leaky_relu(x)
+        return x
+
+    def decoder(self, z):
+        z = self.decode_1(z)
+        z = F.leaky_relu(z)
+        z = self.decode_2(z)
+        z = torch.sigmoid(z)
+        return z
+
+    def forward(self, x, labels):
+        z = self.encoder(x, labels)
+
+        z_y = z.view(z.size(0), self.latent_dim, self.classes_dim)
+        z = F.gumbel_softmax(z_y, tau=self.temperature, hard=True)
+        z_y = F.softmax(z_y, dim=-1).reshape(*z.size())
+
+        z = self.decoder(z.view(z.shape[0], -1))
+
+        z = z.view(z.shape[0], 222, 24, 24)
+        return z, z_y
+
+
 class Loss(nn.Module):
     def forward(self, recon_x, x, mean, classes_dim):
         log_ratio = torch.log(mean * classes_dim + 1e-20)
