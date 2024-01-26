@@ -41,6 +41,7 @@ We demonstrate a dimensionality reduction of the problem alongside order of magn
 ### Gumbel Softmax
 
 * [GSVAE](nb/gumbel/GSVAE.ipynb): A basic variational autoencoder with gumbel softmax reparameterization
+* [LabeledGSVAE](nb/gumbel/LabeledGSVAE.ipynb): A labeled form of GSVAE
 
 ### Math Visualizations
 
