@@ -2,6 +2,8 @@
 
 Pallets is a project to explore pixel art generation in neural networks using toy model building blocks.
 
+A huge shoutout to [@tnn1t1s](https://github.com/tnn1t1s) for starting this project and for mentoring me as I study machine learning.
+
 
 ## Abstract
 
@@ -56,7 +58,7 @@ Get both the cpunks-10k repo and this one
 
 ```shell
 git clone https://github.com/tnn1t1s/cpunks-10k
-git clone https://github.com/tnn1t1s/pallets
+git clone https://github.com/jmsdnns/pallets
 ```
 
 Then setup a venv for pallets and install it
