@@ -2,8 +2,6 @@
 
 Pallets is a project to explore pixel art generation in neural networks using toy model building blocks.
 
-A huge shoutout to [@tnn1t1s](https://github.com/tnn1t1s) for starting this project and for mentoring me as I study machine learning.
-
 
 ## Abstract
 
@@ -69,3 +67,9 @@ python -mvenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+
+## Credits
+
+A huge shoutout to [@tnn1t1s](https://github.com/tnn1t1s) for starting this project and for mentoring me as I study machine learning.
+
