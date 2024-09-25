@@ -1,5 +1,7 @@
 # Pallets
 
+![A cute robot staring at blocks laying on the floor. The background is made of pieces of wood stained in the different bright colors](pallets.jpg)
+
 Pallets is a project to explore pixel art generation in neural networks using toy model building blocks.
 
 
