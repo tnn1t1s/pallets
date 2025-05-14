@@ -54,21 +54,46 @@ We demonstrate a dimensionality reduction of the problem alongside order of magn
 
 ## Setup
 
-Get both the cpunks-10k repo and this one
+### 1. Install Dependencies
+
+Get both the cpunks-10k repo and this one. The cpunks-10k repo must be cloned as a sibling directory to pallets:
 
 ```shell
+# Create a parent directory for both repos
+mkdir -p ~/projects
+cd ~/projects
+
+# Clone the repositories
 git clone https://github.com/tnn1t1s/cpunks-10k
 git clone https://github.com/jmsdnns/pallets
 ```
 
-Then setup a venv for pallets and install it
+### 2. Setup Environment
 
-```
+Create and activate a virtual environment for pallets:
+
+```shell
 cd pallets
 python -mvenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+### 3. Verify Dependencies
+
+The pallets code will automatically verify that the cpunks-10k repository is available and properly set up. If you encounter dependency errors, check that:
+
+1. The cpunks-10k repository is cloned in the correct location
+2. The directory structure inside cpunks-10k is intact
+3. The training images are present in `cpunks-10k/cpunks/images/training/`
+
+### Environment Variables
+
+You can override default paths using these environment variables:
+
+- `CPUNKS_ROOT_DIR`: Path to the cpunks directory (default: `../cpunks-10k/cpunks`)
+- `PALLETS_ARTIFACTS_DIR`: Path to store artifacts (default: `./artifacts`)
+- `PALLETS_SAVED_MODELS_DIR`: Path to store saved models (default: `./saved`)
 
 
 ## Credits

@@ -4,7 +4,12 @@ import torch
 from torchvision.transforms.functional import pil_to_tensor
 
 from . import paths
+from .dependency import verify_cpunks_dependency
 
+
+# Verify that the cpunks-10k dependency is available
+# This is done when the module is imported to fail fast
+verify_cpunks_dependency(raise_error=False)
 
 CPUNKS_IMAGE_DIR = os.path.join(paths.CPUNKS_ROOT, 'images', 'training')
 CPUNKS_SIZE = 10000
@@ -17,10 +22,20 @@ def get_punk_path(id):
 def get_punk(id):
     """
     Loads an image from the punks dataset as an RGB PIL image.
+    
+    Args:
+        id (int): The ID of the punk image to load
+        
+    Returns:
+        PIL.Image: The loaded image
+        
+    Raises:
+        FileNotFoundError: If the image file doesn't exist
     """
     image_path = get_punk_path(id)
     if not os.path.exists(image_path):
-        raise Exception(f"ERROR: image doesn't exist {image_path}")
+        raise FileNotFoundError(f"Image file not found: {image_path}")
+    
     pil_img = PIL.Image.open(image_path)
     return pil_img
 

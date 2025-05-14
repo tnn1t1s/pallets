@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 from pallets import images as I, datasets as DS, models as M, logging as L
+from pallets.dependency import verify_cpunks_dependency
 
 
 ### Settings
@@ -22,9 +23,11 @@ BATCH_SIZE = 32
 logger = L.init_logger(level=LOG_LEVEL, timestamp=True)
 device = M.get_device(require_gpu=USE_GPU)
 
+# Verify dependencies
+logger.info("Verifying dependencies")
+verify_cpunks_dependency(raise_error=True)
 
 # Prep Data
-
 logger.info("preparing data loaders")
 
 if os.path.exists('onehot_ds.pt'):
